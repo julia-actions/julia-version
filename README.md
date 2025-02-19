@@ -74,8 +74,8 @@ need to perform some initial setup steps before you can develop your action.
 
 ## Update the Action Metadata
 
-The [`action.yaml`](action.yaml) file defines metadata about your action, such as
-input(s) and output(s). For details about this file, see
+The [`action.yaml`](action.yaml) file defines metadata about your action, such
+as input(s) and output(s). For details about this file, see
 [Metadata syntax for GitHub Actions](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions).
 
 When you copy this repository, update `action.yaml` with the name, description,
@@ -93,7 +93,7 @@ There are a few things to keep in mind when writing your action code:
   In `main.ts`, you will see that the action is run in an `async` function.
 
   ```javascript
-  import * as core from '@actions/core'
+  import * as core from "@actions/core"
   //...
 
   async function run() {
@@ -182,8 +182,8 @@ in the GitHub Actions toolkit.
 ## Validate the Action
 
 You can now validate the action by referencing it in a workflow file. For
-example, [`ci.yaml`](./.github/workflows/ci.yaml) demonstrates how to reference an
-action in the same repository.
+example, [`ci.yaml`](./.github/workflows/ci.yaml) demonstrates how to reference
+an action in the same repository.
 
 ```yaml
 steps:
