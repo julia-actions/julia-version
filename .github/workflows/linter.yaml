@@ -56,3 +56,4 @@ jobs:
           VALIDATE_JSON: false
           VALIDATE_TYPESCRIPT_STANDARD: false
           YAML_CONFIG_FILE: .yamllint.yaml
+          LOG_LEVEL: DEBUG
