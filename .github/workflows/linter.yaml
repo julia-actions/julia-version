@@ -44,6 +44,8 @@ jobs:
           DEFAULT_BRANCH: main
           FILTER_REGEX_EXCLUDE: dist/**/*
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINTER_RULES_PATH: ""
+          # LOG_LEVEL: DEBUG
           MARKDOWN_CONFIG_FILE: .markdownlint.yaml
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_GIT_COMMITLINT: false
@@ -54,4 +56,3 @@ jobs:
           VALIDATE_JSON: false
           VALIDATE_TYPESCRIPT_STANDARD: false
           YAML_CONFIG_FILE: .yamllint.yaml
-          LOG_LEVEL: DEBUG
