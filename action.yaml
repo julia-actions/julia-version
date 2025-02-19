@@ -1,3 +1,4 @@
+# See: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
 ---
 name: julia-version
 description: Resolve version specifiers into Julia versions
