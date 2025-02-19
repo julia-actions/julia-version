@@ -1,6 +1,6 @@
 name: julia-version
 description: Provide a description here
-author: Your name or organization here
+author: Curtis Vogt
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
