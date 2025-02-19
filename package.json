@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "author": "Curtis Vogt",
   "type": "module",
-  "private": true,
+  "private": false,
   "homepage": "https://github.com/julia-actions/julia-version",
   "repository": {
     "type": "git",
