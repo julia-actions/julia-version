@@ -1,5 +1,5 @@
 name: julia-version
-description: Provide a description here
+description: Resolve version specifiers into Julia versions
 author: Curtis Vogt
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
