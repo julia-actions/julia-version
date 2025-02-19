@@ -52,4 +52,4 @@ jobs:
           VALIDATE_TYPESCRIPT_ES: false
           VALIDATE_JSON: false
           VALIDATE_TYPESCRIPT_STANDARD: false
-          YAML_CONFIG_FILE: .yaml-lint.yaml
+          YAML_CONFIG_FILE: .yamllint.yaml
