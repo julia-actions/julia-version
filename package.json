@@ -1,6 +1,6 @@
 {
   "name": "julia-version",
-  "description": "GitHub Actions TypeScript template",
+  "description": "Resolve version specifiers into Julia versions",
   "version": "0.0.0",
   "author": "Curtis Vogt",
   "type": "module",
