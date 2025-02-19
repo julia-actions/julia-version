@@ -1,3 +1,4 @@
+---
 name: julia-version
 description: Resolve version specifiers into Julia versions
 author: Curtis Vogt
@@ -12,7 +13,7 @@ inputs:
   milliseconds:
     description: Your input description here
     required: true
-    default: '1000'
+    default: "1000"
 
 # Define your outputs here.
 outputs:
