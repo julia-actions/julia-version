@@ -47,6 +47,7 @@ jobs:
           LINTER_RULES_PATH: ${{ github.workspace }}
           MARKDOWN_CONFIG_FILE: .markdown-lint.yaml
           VALIDATE_ALL_CODEBASE: true
+          VALIDATE_GIT_COMMITLINT: false
           VALIDATE_JAVASCRIPT_ES: false
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_JSCPD: false
