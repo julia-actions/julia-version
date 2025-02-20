@@ -8,18 +8,34 @@ author: Curtis Vogt
 branding:
   icon: heart
   color: red
-
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  version:
+    description: >-
+      The Julia version specifier to use. Prefer using strings instead of
+      numeric values avoid unwanted YAML decimal conversions (e.g. `1.10` would
+      will be interpreted as `1.1`). Examples: "1", "1.10", "lts", and "pre".
     required: true
-    default: "1000"
+  include-all-prereleases:
+    description: >-
+      Include prereleases when matching the Julia version specifier.
+    default: "false"
+  arch:
+    description: >-
+      Limit the version specifier to Julia versions which support the specified
+      architecture. Defaults to using the architecture of the GitHub runner
+      executing the action.
+    default: ""
+  project:
+    description: >-
+      The path to the Julia project directory or file to use when resolving some
+      versions (e.g. "min")'
+    required: false
+    default: "" # Empty string is a special value which falls back to using JULIA_PROJECT if defined, otherwise "."
 
 # Define your outputs here.
 outputs:
-  time:
-    description: Your output description here
+  version:
+    description: The complete Julia semver.
 
 runs:
   using: node20
