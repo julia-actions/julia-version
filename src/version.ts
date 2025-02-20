@@ -22,10 +22,10 @@ export type Download = {
 }
 
 type JuliaVersionInfo = {
-    [key: string]: {
-        files: Array<Download>
-        stable: boolean
-    }
+  [key: string]: {
+    files: Array<Download>
+    stable: boolean
+  }
 }
 
 /**
@@ -40,10 +40,13 @@ export async function getJuliaVersionInfo(): Promise<JuliaVersionInfo> {
     async (bail: Function) => {
       const response = await fetch(VERSIONS_JSON_URL)
       return response.text()
-    }, {
+    },
+    {
       retries: 5,
       onRetry: (err: Error) => {
-        core.info(`Download of versions.json failed, trying again. Error: ${err}`)
+        core.info(
+          `Download of versions.json failed, trying again. Error: ${err}`
+        )
       }
     }
   )
@@ -72,33 +75,51 @@ export async function getJuliaVersionInfo(): Promise<JuliaVersionInfo> {
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-export function resolveJuliaVersion(versionSpecifier: string, availableReleases: string[], includePrerelease: boolean = false, juliaCompatRange: string = ""): string {
-    // Note: `juliaCompatRange` is ignored unless `versionSpecifier` is `min`
-    let version: string | null
+export function resolveJuliaVersion(
+  versionSpecifier: string,
+  availableReleases: string[],
+  includePrerelease: boolean = false,
+  juliaCompatRange: string = ""
+): string {
+  // Note: `juliaCompatRange` is ignored unless `versionSpecifier` is `min`
+  let version: string | null
 
-    if (semver.valid(versionSpecifier) == versionSpecifier) {
-        // versionSpecifier is already a valid semver version (not a semver range)
-        version = versionSpecifier
-    } else if (versionSpecifier === "min") {
-        // Resolve "min" to the minimum supported Julia version compatible with the project file
-        if (!juliaCompatRange) {
-            throw new Error('Unable to use version "min" when the Julia project file does not specify a compat for Julia')
-        }
-        version = semver.minSatisfying(availableReleases, juliaCompatRange, {includePrerelease})
-    } else if (versionSpecifier === "lts") {
-        version = semver.maxSatisfying(availableReleases, LTS_VERSION, { includePrerelease: false });
-    } else if (versionSpecifier === "pre") {
-        version = semver.maxSatisfying(availableReleases, "*", { includePrerelease: true });
-    } else {
-        // Use the highest available version that match the versionSpecifier
-        version = semver.maxSatisfying(availableReleases, versionSpecifier, {includePrerelease})
+  if (semver.valid(versionSpecifier) == versionSpecifier) {
+    // versionSpecifier is already a valid semver version (not a semver range)
+    version = versionSpecifier
+  } else if (versionSpecifier === "min") {
+    // Resolve "min" to the minimum supported Julia version compatible with the
+    // project file
+    if (!juliaCompatRange) {
+      throw new Error(
+        'Unable to use version "min" when the Julia project file does not specify a compat for Julia'
+      )
     }
+    version = semver.minSatisfying(availableReleases, juliaCompatRange, {
+      includePrerelease
+    })
+  } else if (versionSpecifier === "lts") {
+    version = semver.maxSatisfying(availableReleases, LTS_VERSION, {
+      includePrerelease: false
+    })
+  } else if (versionSpecifier === "pre") {
+    version = semver.maxSatisfying(availableReleases, "*", {
+      includePrerelease: true
+    })
+  } else {
+    // Use the highest available version that match the versionSpecifier
+    version = semver.maxSatisfying(availableReleases, versionSpecifier, {
+      includePrerelease
+    })
+  }
 
-    if (!version) {
-        throw new Error(`Could not find a Julia version that matches ${versionSpecifier}`)
-    }
+  if (!version) {
+    throw new Error(
+      `Could not find a Julia version that matches ${versionSpecifier}`
+    )
+  }
 
-    return version
+  return version
 }
 
 /**
@@ -108,63 +129,71 @@ export function resolveJuliaVersion(versionSpecifier: string, availableReleases:
  * @param majorMinorVersion: The partial nightly version number
  * @returns A list of downloads which exist.
  */
-export async function genNightlies(majorMinorVersion: string = ""): Promise<Array<Download>> {
-    const baseUrl = "https://julialangnightlies-s3.julialang.org/bin"
-    const nightlies = [
-        {platform: "winnt", arch: "x64", suffix: "win64", ext: "tar.gz"},
-        // {platform: "winnt", arch: "x64", suffix: "win64", ext: "zip"},
-        {platform: "winnt", arch: "x64", suffix: "win64", ext: "exe"},
-        {platform: "winnt", arch: "x86", suffix: "win32", ext: "tar.gz"},
-        // {platform: "winnt", arch: "x86", suffix: "win32", ext: "zip"},
-        {platform: "winnt", arch: "x86", suffix: "win32", ext: "exe"},
-        {platform: "macos", arch: "aarch64", ext: "tar.gz"},
-        {platform: "macos", arch: "aarch64", ext: "dmg"},
-        {platform: "macos", arch: "x86_64", ext: "tar.gz"},
-        {platform: "macos", arch: "x86_64", ext: "dmg"},
-        {platform: "linux", arch: "x86_64", ext: "tar.gz"},
-        {platform: "linux", arch: "aarch64", ext: "tar.gz"},
-        {platform: "linux", arch: "i686", ext: "tar.gz"},
-        {platform: "freebsd", arch: "x86_64", ext: "tar.gz"},
-    ]
-    const majorMinorDir = majorMinorVersion ? majorMinorVersion + "/" : ""
+export async function genNightlies(
+  majorMinorVersion: string = ""
+): Promise<Array<Download>> {
+  const baseUrl = "https://julialangnightlies-s3.julialang.org/bin"
+  const nightlies = [
+    { platform: "winnt", arch: "x64", suffix: "win64", ext: "tar.gz" },
+    // {platform: "winnt", arch: "x64", suffix: "win64", ext: "zip"},
+    { platform: "winnt", arch: "x64", suffix: "win64", ext: "exe" },
+    { platform: "winnt", arch: "x86", suffix: "win32", ext: "tar.gz" },
+    // {platform: "winnt", arch: "x86", suffix: "win32", ext: "zip"},
+    { platform: "winnt", arch: "x86", suffix: "win32", ext: "exe" },
+    { platform: "macos", arch: "aarch64", ext: "tar.gz" },
+    { platform: "macos", arch: "aarch64", ext: "dmg" },
+    { platform: "macos", arch: "x86_64", ext: "tar.gz" },
+    { platform: "macos", arch: "x86_64", ext: "dmg" },
+    { platform: "linux", arch: "x86_64", ext: "tar.gz" },
+    { platform: "linux", arch: "aarch64", ext: "tar.gz" },
+    { platform: "linux", arch: "i686", ext: "tar.gz" },
+    { platform: "freebsd", arch: "x86_64", ext: "tar.gz" }
+  ]
+  const majorMinorDir = majorMinorVersion ? majorMinorVersion + "/" : ""
 
-    let downloads = []
-    for (var nightly of nightlies) {
-        let kind = "unknown"
-        if (nightly.ext === "exe") {
-            kind = "installer"
-        } else if (nightly.ext === "tar.gz" || nightly.ext === "zip" || nightly.ext === "dmg") {
-            kind = "archive"
-        }
-
-        const suffix = nightly.suffix ?? `${nightly.platform}-${nightly.arch}`
-        const url = `${baseUrl}/${nightly.platform}/${nightly.arch}/${majorMinorDir}julia-latest-${suffix}.${nightly.ext}`
-
-        // Perform a HEAD request to validate the specified nightly exists.
-        // TODO: Verify the performance of these requests in CI.
-        const response = await fetch(url, {method: "HEAD"})
-        if (response.status == 200) {
-            const size = parseInt(response.headers.get("content-length") ?? "0")
-
-            // TODO: Ideally we would return a proper semver version but this information appears to be unavailable
-            // from metadata alone.
-            downloads.push({
-                url,
-                // triplet, // Avoiding including as we cannot determine the ABI from current metadata
-                kind,
-                arch: nightly.arch,
-                // sha256, // Avoiding including as we cannot determine this from the HEAD request
-                size,
-                version: majorMinorVersion ? majorMinorVersion : "nightly",
-                os: nightly.platform,
-                extension: nightly.ext,
-            })
-        } else if (response.status != 404) {
-            console.error(`HTTP HEAD request to ${url} failed with response: ${response.status} ${response.statusText}`)
-            const errorBody = await response.text();
-            console.error(`${errorBody}`)
-        }
+  let downloads = []
+  for (var nightly of nightlies) {
+    let kind = "unknown"
+    if (nightly.ext === "exe") {
+      kind = "installer"
+    } else if (
+      nightly.ext === "tar.gz" ||
+      nightly.ext === "zip" ||
+      nightly.ext === "dmg"
+    ) {
+      kind = "archive"
     }
 
-    return downloads
+    const suffix = nightly.suffix ?? `${nightly.platform}-${nightly.arch}`
+    const url = `${baseUrl}/${nightly.platform}/${nightly.arch}/${majorMinorDir}julia-latest-${suffix}.${nightly.ext}`
+
+    // Perform a HEAD request to validate the specified nightly exists.
+    // TODO: Verify the performance of these requests in CI.
+    const response = await fetch(url, { method: "HEAD" })
+    if (response.status == 200) {
+      const size = parseInt(response.headers.get("content-length") ?? "0")
+
+      // TODO: Ideally we would return a proper semver version but this
+      // information appears to be unavailable from metadata alone.
+      downloads.push({
+        url,
+        // triplet, // Avoiding including as we cannot determine the ABI from current metadata
+        kind,
+        arch: nightly.arch,
+        // sha256, // Avoiding including as we cannot determine this from the HEAD request
+        size,
+        version: majorMinorVersion ? majorMinorVersion : "nightly",
+        os: nightly.platform,
+        extension: nightly.ext
+      })
+    } else if (response.status != 404) {
+      console.error(
+        `HTTP HEAD request to ${url} failed with response: ${response.status} ${response.statusText}`
+      )
+      const errorBody = await response.text()
+      console.error(`${errorBody}`)
+    }
+  }
+
+  return downloads
 }
