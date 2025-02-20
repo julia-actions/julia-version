@@ -1,0 +1,98 @@
+import * as fs from "fs"
+import * as path from "path"
+import * as semver from "semver"
+
+export type JuliaProjectTOML = {
+  compat: {
+    julia: string | undefined
+  }
+}
+
+/**
+ * Determine the path to a Julia project file from a directory or filename.
+ *
+ * @returns The path to the Julia project file.
+ * @throws Error if the Julia project file doesn't exist.
+ */
+export function getJuliaProjectFile(juliaProject: string): string {
+    let juliaProjectFile: string = ""
+
+    if (fs.existsSync(juliaProject) && fs.lstatSync(juliaProject).isFile()) {
+        juliaProjectFile = juliaProject
+    } else {
+        for (let filename of ["JuliaProject.toml", "Project.toml"]) {
+            let p = path.join(juliaProject, filename)
+            if (fs.existsSync(p) && fs.lstatSync(p).isFile()) {
+                juliaProjectFile = p
+                break
+            }
+        }
+    }
+
+    if (!juliaProjectFile) {
+        throw new Error(`Unable to locate project file with project input: ${juliaProject}`)
+    }
+
+    return juliaProjectFile
+}
+
+/**
+ * Determine the NPM semver range string from a parsed Julia project TOML.
+ *
+ * @returns A NPM semver range string.
+ * @throws Error if the Julia compat range cannot be converted into a NPM semver range.
+ */
+export function getJuliaCompatRange(juliaProject: JuliaProjectTOML): string {
+    let compatRange: string | null
+
+    if (juliaProject.compat?.julia !== undefined) {
+        compatRange = validJuliaCompatRange(juliaProject.compat.julia)
+    } else {
+        compatRange = "*"
+    }
+
+    if (!compatRange) {
+        throw new Error(`Invalid version range found in Julia compat: ${compatRange}`)
+    }
+
+    return compatRange
+}
+
+/**
+ * Convert a Julia compat range into a NPM semver range.
+ *
+ * @returns An NPM semver range string or null if the input is invalid.
+ */
+export function validJuliaCompatRange(compatRange: string): string | null {
+    let ranges: Array<string> = []
+    for(let range of compatRange.split(",")) {
+        range = range.trim()
+
+        // An empty range isn't supported by Julia
+        if (!range) {
+            return null
+        }
+
+        // NPM's semver doesn't understand unicode characters such as `≥` so we'll convert to alternatives
+        range = range.replace("≥", ">=").replace("≤", "<=")
+
+        // Cleanup whitespace. Julia only allows whitespace between the specifier and version with certain specifiers
+        range = range.replace(/\s+/g, " ").replace(/(?<=(>|>=|≥|<)) (?=\d)/g, "")
+
+        if (!semver.validRange(range) || range.split(/(?<! -) (?!- )/).length > 1 || range.startsWith("<=") || range === "*") {
+            return null
+        } else if (range.search(/^\d/) === 0 && !range.includes(" ")) {
+            // Compat version is just a basic version number (e.g. 1.2.3). Since Julia's Pkg.jl's uses caret
+            // as the default specifier (e.g. `1.2.3 == ^1.2.3`) and NPM's semver uses tilde as the default
+            // specifier (e.g. `1.2.3 == 1.2.x == ~1.2.3`) we will introduce the caret specifier to ensure the
+            // orignal intent is respected.
+            // https://pkgdocs.julialang.org/v1/compatibility/#Version-specifier-format
+            // https://github.com/npm/node-semver#x-ranges-12x-1x-12-
+            range = "^" + range
+        }
+
+        ranges.push(range)
+    }
+
+    return semver.validRange(ranges.join(" || "))
+}
