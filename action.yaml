@@ -3,11 +3,9 @@
 name: julia-version
 description: Resolve version specifiers into Julia versions
 author: Curtis Vogt
-
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
+  icon: filter
+  color: purple
 inputs:
   version:
     description: >-
@@ -31,12 +29,11 @@ inputs:
       versions (e.g. "min")'
     required: false
     default: "" # Empty string is a special value which falls back to using JULIA_PROJECT if defined, otherwise "."
-
-# Define your outputs here.
 outputs:
   version:
-    description: The complete Julia semver.
-
+    description: The resolved Julia version
+  downloads-json:
+    description: JSON list of downlaods available for the specified Julia version
 runs:
   using: node20
   main: dist/index.js

@@ -3,7 +3,7 @@ import * as fs from "fs"
 import * as toml from "toml"
 
 import {getJuliaProjectFile, getJuliaCompatRange} from "./project.js"
-import {getJuliaVersionInfo, resolveJuliaVersion, genNightlies} from "./version.js"
+import {getJuliaVersionInfo, resolveJuliaVersion, genNightlies, Download} from "./version.js"
 
 /**
  * The main function for the action.
@@ -31,23 +31,24 @@ export async function run(): Promise<void> {
         core.debug(`Julia project compatibility range: ${juliaCompatRange}`)
     }
 
-    let version
-    let versionDownloads
+    let version: string
+    let downloads: Array<Download>
 
+    // Nightlies are not included in the versions.json file
     const nightlyMatch = /^(?:(\d+\.\d+)-)?nightly$/.exec(versionSpecifier)
     if (nightlyMatch) {
-        versionDownloads = await genNightlies(nightlyMatch[1])
-        version = versionDownloads.length ? versionSpecifier : ""
+        downloads = await genNightlies(nightlyMatch[1])
+        version = downloads.length ? versionSpecifier : ""
     } else {
         const versionInfo = await getJuliaVersionInfo()
         const availableReleases = Object.keys(versionInfo)
         version = resolveJuliaVersion(versionSpecifier, availableReleases, includePrereleases, juliaCompatRange)
-        versionDownloads = versionInfo[version].files
+        downloads = versionInfo[version].files
     }
 
     core.debug(`Selected Julia version: ${version}`)
     core.setOutput("version", version)
-    core.setOutput("downloads", JSON.stringify(versionDownloads, null, 4))
+    core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

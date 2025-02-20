@@ -1,8 +1,9 @@
 import * as core from "@actions/core"
-import * as fs from "fs"
+import fetch from "node-fetch"
 import retry from "async-retry"
 import * as semver from "semver"
-import * as tc from "@actions/tool-cache"
+
+const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json"
 
 // TODO: Add marker to versions.json to indicate LTS?
 const LTS_VERSION = "1.10"
@@ -12,6 +13,7 @@ export type Download = {
   triplet?: string
   kind: string
   arch: string
+  asc?: string
   sha256?: string
   size: number
   version: string
@@ -32,18 +34,25 @@ type JuliaVersionInfo = {
  * @returns The content of the downloaded versions.json file as object.
  */
 export async function getJuliaVersionInfo(): Promise<JuliaVersionInfo> {
-    // Occasionally the connection is reset for unknown reasons
-    // In those cases, retry the download
-    const versionsFile = await retry(async (bail: Function) => {
-        return await tc.downloadTool("https://julialang-s3.julialang.org/bin/versions.json")
+  // Occasionally the connection is reset for unknown reasons
+  // In those cases, retry the download
+  const versionsFile = await retry(
+    async (bail: Function) => {
+      const response = await fetch(VERSIONS_JSON_URL)
+      return response.text()
     }, {
-        retries: 5,
-        onRetry: (err: Error) => {
-            core.info(`Download of versions.json failed, trying again. Error: ${err}`)
-        }
-    })
+      retries: 5,
+      onRetry: (err: Error) => {
+        core.info(`Download of versions.json failed, trying again. Error: ${err}`)
+      }
+    }
+  )
 
-    return JSON.parse(fs.readFileSync(versionsFile).toString())
+  if (!versionsFile) {
+    throw new Error(`Unable to download versions.json after 5 attempts`)
+  }
+
+  return JSON.parse(versionsFile)
 }
 
 /**
