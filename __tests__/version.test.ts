@@ -1,5 +1,5 @@
 /**
- * Unit tests for src/project.ts
+ * Unit tests for src/version.ts
  */
 import * as semver from "semver"
 
