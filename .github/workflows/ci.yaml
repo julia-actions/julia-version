@@ -51,7 +51,7 @@ jobs:
         id: julia-version
         uses: ./
         with:
-          version: "min"
+          version: min
 
       - name: Validate output
         shell: bash
