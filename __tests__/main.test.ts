@@ -6,8 +6,8 @@
  * so that the actual '@actions/core' module is not imported.
  */
 import { jest } from "@jest/globals"
-import * as path from "path"
-import * as url from "url"
+import * as path from "node:path"
+import * as url from "node:url"
 import nock from "nock"
 
 import * as core from "../__fixtures__/core.js"

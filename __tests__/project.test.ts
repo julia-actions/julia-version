@@ -1,8 +1,8 @@
 /**
  * Unit tests for src/project.ts
  */
-import * as fs from "fs"
-import * as path from "path"
+import * as fs from "node:fs"
+import * as path from "node:path"
 import * as semver from "semver"
 import * as toml from "toml"
 import { tmpdir } from "node:os"
