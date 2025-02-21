@@ -13,6 +13,12 @@ import nock from "nock"
 import * as core from "../__fixtures__/core.js"
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
+const versionsJsonFile = path.join(
+  __dirname,
+  "..",
+  "__fixtures__",
+  "versions.json"
+)
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core)
@@ -49,10 +55,7 @@ describe("main.ts", () => {
     nock("https://julialang-s3.julialang.org")
       .persist()
       .get("/bin/versions.json")
-      .replyWithFile(
-        200,
-        path.join(__dirname, "..", "__fixtures__", "versions.json")
-      )
+      .replyWithFile(200, versionsJsonFile)
   })
 
   afterEach(() => {
