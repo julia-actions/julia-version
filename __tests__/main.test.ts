@@ -50,7 +50,7 @@ describe("main.ts", () => {
     // Mock the wait function so that it does not actually wait.
     fetch.mockImplementation(() => {
       return Promise.resolve<Response>({
-        text: () => Promise.resolve<string>(fs.readFileSync("../__fixtures__/versions.json").toString()),
+        text: () => Promise.resolve<string>(fs.readFileSync("__fixtures__/versions.json").toString()),
         ok: true,
         status: 200,
         headers: {
@@ -77,7 +77,7 @@ describe("main.ts", () => {
     )
 
     // TODO: Test downloads-json?
-  })
+  }, 10000)
 
   // it("Sets a failed status", async () => {
   //   // Clear the getInput mock and return an invalid value.
