@@ -17,12 +17,6 @@ inputs:
     description: >-
       Include prereleases when matching the Julia version specifier.
     default: "false"
-  arch:
-    description: >-
-      Limit the version specifier to Julia versions which support the specified
-      architecture. Defaults to using the architecture of the GitHub runner
-      executing the action.
-    default: ""
   project:
     description: >-
       The path to the Julia project directory or file to use when resolving some
