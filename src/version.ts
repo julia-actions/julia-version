@@ -37,7 +37,7 @@ export async function getJuliaVersionInfo(): Promise<JuliaVersionInfo> {
   // Occasionally the connection is reset for unknown reasons
   // In those cases, retry the download
   const versionsFile = await retry(
-    async (bail: Function) => {
+    async () => {
       const response = await fetch(VERSIONS_JSON_URL)
       return response.text()
     },
@@ -151,8 +151,8 @@ export async function genNightlies(
   ]
   const majorMinorDir = majorMinorVersion ? majorMinorVersion + "/" : ""
 
-  let downloads = []
-  for (var nightly of nightlies) {
+  const downloads = []
+  for (const nightly of nightlies) {
     let kind = "unknown"
     if (nightly.ext === "exe") {
       kind = "installer"

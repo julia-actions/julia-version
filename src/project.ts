@@ -20,8 +20,8 @@ export function getJuliaProjectFile(juliaProject: string): string {
   if (fs.existsSync(juliaProject) && fs.lstatSync(juliaProject).isFile()) {
     juliaProjectFile = juliaProject
   } else {
-    for (let filename of ["JuliaProject.toml", "Project.toml"]) {
-      let p = path.join(juliaProject, filename)
+    for (const filename of ["JuliaProject.toml", "Project.toml"]) {
+      const p = path.join(juliaProject, filename)
       if (fs.existsSync(p) && fs.lstatSync(p).isFile()) {
         juliaProjectFile = p
         break
@@ -68,7 +68,7 @@ export function getJuliaCompatRange(juliaProject: JuliaProjectTOML): string {
  * @returns An NPM semver range string or null if the input is invalid.
  */
 export function validJuliaCompatRange(compatRange: string): string | null {
-  let ranges: Array<string> = []
+  const ranges: Array<string> = []
   for (let range of compatRange.split(",")) {
     range = range.trim()
 
