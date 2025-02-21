@@ -8,16 +8,18 @@
 import { jest } from "@jest/globals"
 import * as fs from "fs"
 import * as core from "../__fixtures__/core.js"
-import fetch from "jest-fetch-mock"
+// import fetch from "jest-fetch-mock"
+import { fetch } from "../__fixtures__/fetch.js"
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core)
+jest.unstable_mockModule("../src/fetch.js", () => ({ fetch }))
 // jest.unstable_mockModule("../src/wait.js", () => ({ wait }))
 // jest.unstable_mockModule("../src/version.js", () => ({ getJuliaVersionInfo, genNightlies }))
 
-fetch.enableMocks()
-
 // https://github.com/node-fetch/node-fetch/issues/1263
+
+import { Response } from "../src/fetch.js"
 
 // The module being tested should be imported dynamically. This ensures that the
 // mocks are used in place of any actual dependencies.
@@ -46,10 +48,15 @@ describe("main.ts", () => {
     })
 
     // Mock the wait function so that it does not actually wait.
-    fetch.mockResponse(req => {
-      return Promise.resolve(
-        JSON.parse(fs.readFileSync("../__fixtures__/versions.json").toString())
-      )
+    fetch.mockImplementation(() => {
+      return Promise.resolve<Response>({
+        text: () => Promise.resolve<string>(fs.readFileSync("../__fixtures__/versions.json").toString()),
+        ok: true,
+        status: 200,
+        headers: {
+          get: () => null
+        }
+      })
     })
   })
 

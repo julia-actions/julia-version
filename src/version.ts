@@ -1,7 +1,8 @@
 import * as core from "@actions/core"
-import fetch from "node-fetch"
+// import fetch from "node-fetch"
 import retry from "async-retry"
 import * as semver from "semver"
+import { fetch } from "./fetch.js"
 
 const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json"
 
