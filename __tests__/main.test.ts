@@ -46,9 +46,13 @@ describe("main.ts", () => {
     // Instead of downloading versions.json, use `__fixtures__/versions.json`.
     // Mocking `node-fetch` with `jest` directly or `jest-fetch-mock` doesn't work well with ESM:
     // https://github.com/node-fetch/node-fetch/issues/1263
-    nock("https://julialang-s3.julialang.org").persist()
+    nock("https://julialang-s3.julialang.org")
+      .persist()
       .get("/bin/versions.json")
-      .replyWithFile(200, path.join(__dirname, "..", "__fixtures__", "versions.json"))
+      .replyWithFile(
+        200,
+        path.join(__dirname, "..", "__fixtures__", "versions.json")
+      )
   })
 
   afterEach(() => {
