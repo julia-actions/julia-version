@@ -41820,7 +41820,7 @@ async function run() {
             version = resolveJuliaVersion(versionSpecifier, availableReleases, includePrereleases, juliaCompatRange);
             downloads = versionInfo[version].files;
         }
-        coreExports.debug(`Selected Julia version: ${version}`);
+        process.env.CI && coreExports.info(`version=${version}`);
         coreExports.setOutput("version", version);
         // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
     }
