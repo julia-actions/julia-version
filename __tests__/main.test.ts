@@ -6,24 +6,16 @@
  * so that the actual '@actions/core' module is not imported.
  */
 import { jest } from "@jest/globals"
-import * as fs from "fs"
 import * as path from "path"
 import * as url from "url"
+import nock from "nock"
 
 import * as core from "../__fixtures__/core.js"
-import { fetch } from "../__fixtures__/fetch.js"
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core)
-jest.unstable_mockModule("../src/fetch.js", () => ({ fetch }))
-// jest.unstable_mockModule("../src/wait.js", () => ({ wait }))
-// jest.unstable_mockModule("../src/version.js", () => ({ getJuliaVersionInfo, genNightlies }))
-
-// https://github.com/node-fetch/node-fetch/issues/1263
-
-import { Response } from "../src/fetch.js"
 
 // The module being tested should be imported dynamically. This ensures that the
 // mocks are used in place of any actual dependencies.
@@ -51,21 +43,17 @@ describe("main.ts", () => {
       }
     })
 
-    // Mock the wait function so that it does not actually wait.
-    fetch.mockImplementation(() => {
-      return Promise.resolve<Response>({
-        text: () => Promise.resolve<string>(fs.readFileSync(path.join(__dirname, "..", "__fixtures__", "versions.json")).toString()),
-        ok: true,
-        status: 200,
-        headers: {
-          get: () => null
-        }
-      })
-    })
+    // Instead of downloading versions.json, use `__fixtures__/versions.json`.
+    // Mocking `node-fetch` with `jest` directly or `jest-fetch-mock` doesn't work well with ESM:
+    // https://github.com/node-fetch/node-fetch/issues/1263
+    nock("https://julialang-s3.julialang.org").persist()
+      .get("/bin/versions.json")
+      .replyWithFile(200, path.join(__dirname, "..", "__fixtures__", "versions.json"))
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+    nock.cleanAll()
   })
 
   it("Sets the time output", async () => {
