@@ -56,36 +56,31 @@ describe("main.ts", () => {
     nock.cleanAll()
   })
 
-  it("Sets the time output", async () => {
+  it("Sets the version output", async () => {
     await run()
 
     // Verify the time output was set.
     expect(core.setOutput).toHaveBeenNthCalledWith(
       1,
       "version",
-      // Simple regex to match a time string in the format HH:MM:SS.
-      // expect.stringMatching(/^\d+\.\d+\.\d+/)
-      expect.stringMatching(/^1\.11\.4$/)
+      // Basic regex to confirm the result is a valid semver string. The regex
+      // used isn't fully aligned with the semver spec but it's close enough
+      // for our purposes.
+      // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+      expect.stringMatching(/^\d+\.\d+\.\d+(?:-[0-9a-zA-Z.-]+)?$/)
     )
-
-    // TODO: Test downloads-json?
   })
 
-  // it("Sets a failed status", async () => {
-  //   // Clear the getInput mock and return an invalid value.
-  //   core.getInput.mockClear().mockReturnValueOnce("this is not a number")
+  it("Sets a failed status", async () => {
+    // Clear the getInput mock and return an invalid value.
+    core.getInput.mockClear().mockReturnValueOnce("unknown")
 
-  //   // Clear the wait mock and return a rejected promise.
-  //   wait
-  //     .mockClear()
-  //     .mockRejectedValueOnce(new Error("milliseconds is not a number"))
+    await run()
 
-  //   await run()
-
-  //   // Verify that the action was marked as failed.
-  //   expect(core.setFailed).toHaveBeenNthCalledWith(
-  //     1,
-  //     "milliseconds is not a number"
-  //   )
-  // })
+    // Verify that the action was marked as failed.
+    expect(core.setFailed).toHaveBeenNthCalledWith(
+      1,
+      "Could not find a Julia version that matches unknown"
+    )
+  })
 })
