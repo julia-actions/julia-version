@@ -65,7 +65,7 @@ describe("main.ts", () => {
       // used isn't fully aligned with the semver spec but it's close enough
       // for our purposes.
       // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-      expect.stringMatching(/^\d+\.\d+\.\d+(?:-[0-9a-zA-Z.-]+)?$/)
+      expect.stringMatching(/^\["\d+\.\d+\.\d+(?:-[0-9a-zA-Z.-]+)?"\]$/)
     )
   })
 

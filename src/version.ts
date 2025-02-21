@@ -67,7 +67,7 @@ export async function getJuliaVersionInfo(): Promise<JuliaVersionInfo> {
  * - `min`: The earliest version of Julia within the `juliaCompatRange`.
  *
  * @param versionSpecifier: The version number specifier or alias.
- * @param availableReleases: An array of available Julia versions.
+ * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
  * @param juliaCompatRange: The semver range to further restrict the results (TODO: We could probably roll this into versionSpecifier)
@@ -77,14 +77,14 @@ export async function getJuliaVersionInfo(): Promise<JuliaVersionInfo> {
  */
 export function resolveJuliaVersion(
   versionSpecifier: string,
-  availableReleases: string[],
+  availableVersions: string[],
   includePrerelease: boolean = false,
   juliaCompatRange: string = ""
-): string {
+): string | null {
   // Note: `juliaCompatRange` is ignored unless `versionSpecifier` is `min`
   let version: string | null
 
-  if (semver.valid(versionSpecifier) == versionSpecifier) {
+  if (semver.valid(versionSpecifier) == versionSpecifier && availableVersions.includes(versionSpecifier)) {
     // versionSpecifier is already a valid semver version (not a semver range)
     version = versionSpecifier
   } else if (versionSpecifier === "min") {
@@ -95,28 +95,29 @@ export function resolveJuliaVersion(
         'Unable to use version "min" when the Julia project file does not specify a compat for Julia'
       )
     }
-    version = semver.minSatisfying(availableReleases, juliaCompatRange, {
+    version = semver.minSatisfying(availableVersions, juliaCompatRange, {
       includePrerelease
     })
   } else if (versionSpecifier === "lts") {
-    version = semver.maxSatisfying(availableReleases, LTS_VERSION, {
+    version = semver.maxSatisfying(availableVersions, LTS_VERSION, {
       includePrerelease: false
     })
   } else if (versionSpecifier === "pre") {
-    version = semver.maxSatisfying(availableReleases, "*", {
+    version = semver.maxSatisfying(availableVersions, "*", {
       includePrerelease: true
     })
   } else {
     // Use the highest available version that match the versionSpecifier
-    version = semver.maxSatisfying(availableReleases, versionSpecifier, {
+    version = semver.maxSatisfying(availableVersions, versionSpecifier, {
       includePrerelease
     })
-  }
 
-  if (!version) {
-    throw new Error(
-      `Could not find a Julia version that matches ${versionSpecifier}`
-    )
+    // TODO: Probably makes sense to throw this when the user provides a specifier which is out of bounds
+    if (!version) {
+      throw new Error(
+        `Could not find a Julia version that matches ${versionSpecifier}`
+      )
+    }
   }
 
   return version
