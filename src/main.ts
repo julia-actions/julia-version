@@ -71,7 +71,7 @@ export async function run(): Promise<void> {
       downloads = versionInfo[version].files
     }
 
-    core.debug(`Selected Julia version: ${version}`)
+    process.env.CI && core.info(`version=${version}`)
     core.setOutput("version", version)
     // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
   } catch (error) {
