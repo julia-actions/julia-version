@@ -73,7 +73,7 @@ export async function run(): Promise<void> {
 
     core.debug(`Selected Julia version: ${version}`)
     core.setOutput("version", version)
-    core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
+    // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

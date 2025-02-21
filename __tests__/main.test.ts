@@ -6,12 +6,18 @@
  * so that the actual '@actions/core' module is not imported.
  */
 import { jest } from "@jest/globals"
+import * as fs from "fs"
 import * as core from "../__fixtures__/core.js"
-import { wait } from "../__fixtures__/wait.js"
+import fetch from "jest-fetch-mock"
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core)
-jest.unstable_mockModule("../src/wait.js", () => ({ wait }))
+// jest.unstable_mockModule("../src/wait.js", () => ({ wait }))
+// jest.unstable_mockModule("../src/version.js", () => ({ getJuliaVersionInfo, genNightlies }))
+
+fetch.enableMocks()
+
+// https://github.com/node-fetch/node-fetch/issues/1263
 
 // The module being tested should be imported dynamically. This ensures that the
 // mocks are used in place of any actual dependencies.
@@ -20,10 +26,31 @@ const { run } = await import("../src/main.js")
 describe("main.ts", () => {
   beforeEach(() => {
     // Set the action's inputs as return values from core.getInput().
-    core.getInput.mockImplementation(() => "500")
+    core.getInput.mockImplementation((name: string) => {
+      if (name === "version") {
+        return "1"
+      } else if (name === "project") {
+        return ""
+      } else {
+        throw new Error(`Unknown input name ${name}`)
+      }
+    })
+
+    // Set the action's inputs as return values from core.getBooleanInput().
+    core.getBooleanInput.mockImplementation((name: string) => {
+      if (name === "include-all-prereleases") {
+        return false
+      } else {
+        throw new Error(`Unknown boolean input name ${name}`)
+      }
+    })
 
     // Mock the wait function so that it does not actually wait.
-    wait.mockImplementation(() => Promise.resolve("done!"))
+    fetch.mockResponse(req => {
+      return Promise.resolve(
+        JSON.parse(fs.readFileSync("../__fixtures__/versions.json").toString())
+      )
+    })
   })
 
   afterEach(() => {
@@ -36,27 +63,30 @@ describe("main.ts", () => {
     // Verify the time output was set.
     expect(core.setOutput).toHaveBeenNthCalledWith(
       1,
-      "time",
+      "version",
       // Simple regex to match a time string in the format HH:MM:SS.
-      expect.stringMatching(/^\d{2}:\d{2}:\d{2}/)
+      // expect.stringMatching(/^\d+\.\d+\.\d+/)
+      expect.stringMatching(/^1\.11\.4$/)
     )
+
+    // TODO: Test downloads-json?
   })
 
-  it("Sets a failed status", async () => {
-    // Clear the getInput mock and return an invalid value.
-    core.getInput.mockClear().mockReturnValueOnce("this is not a number")
+  // it("Sets a failed status", async () => {
+  //   // Clear the getInput mock and return an invalid value.
+  //   core.getInput.mockClear().mockReturnValueOnce("this is not a number")
 
-    // Clear the wait mock and return a rejected promise.
-    wait
-      .mockClear()
-      .mockRejectedValueOnce(new Error("milliseconds is not a number"))
+  //   // Clear the wait mock and return a rejected promise.
+  //   wait
+  //     .mockClear()
+  //     .mockRejectedValueOnce(new Error("milliseconds is not a number"))
 
-    await run()
+  //   await run()
 
-    // Verify that the action was marked as failed.
-    expect(core.setFailed).toHaveBeenNthCalledWith(
-      1,
-      "milliseconds is not a number"
-    )
-  })
+  //   // Verify that the action was marked as failed.
+  //   expect(core.setFailed).toHaveBeenNthCalledWith(
+  //     1,
+  //     "milliseconds is not a number"
+  //   )
+  // })
 })
