@@ -52,12 +52,12 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Test Local Action
-        id: test-action
+      - name: Test julia-version
+        id: julia-version
         uses: ./
         with:
-          milliseconds: 2000
+          version: "1"
 
       - name: Print Output
         id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+        run: echo "${{ steps.julia-version.outputs.version }}"
