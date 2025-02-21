@@ -7,9 +7,13 @@
  */
 import { jest } from "@jest/globals"
 import * as fs from "fs"
+import * as path from "path"
+import * as url from "url"
+
 import * as core from "../__fixtures__/core.js"
-// import fetch from "jest-fetch-mock"
 import { fetch } from "../__fixtures__/fetch.js"
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core)
@@ -50,7 +54,7 @@ describe("main.ts", () => {
     // Mock the wait function so that it does not actually wait.
     fetch.mockImplementation(() => {
       return Promise.resolve<Response>({
-        text: () => Promise.resolve<string>(fs.readFileSync("__fixtures__/versions.json").toString()),
+        text: () => Promise.resolve<string>(fs.readFileSync(path.join(__dirname, "..", "__fixtures__", "versions.json")).toString()),
         ok: true,
         status: 200,
         headers: {
@@ -77,7 +81,7 @@ describe("main.ts", () => {
     )
 
     // TODO: Test downloads-json?
-  }, 10000)
+  })
 
   // it("Sets a failed status", async () => {
   //   // Clear the getInput mock and return an invalid value.

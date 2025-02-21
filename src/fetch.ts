@@ -1,3 +1,6 @@
+// Working around issues with `node-fetch` and incompatibilities with ESM:
+// https://github.com/node-fetch/node-fetch/issues/1263
+
 // import { Response } from "@types/node-fetch"
 // import node_fetch from "node-fetch"
 import * as fs from "fs"
