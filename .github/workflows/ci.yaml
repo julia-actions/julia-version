@@ -16,31 +16,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        id: setup-node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: npm
 
       - name: Install Dependencies
-        id: npm-ci
         run: npm ci
 
       - name: Check Format
-        id: npm-format-check
         run: npm run format:check
 
       - name: Lint
-        id: npm-lint
         run: npm run lint
 
       - name: Test
-        id: npm-ci-test
         run: npm run ci-test
 
   test-action:
@@ -48,16 +40,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Create Project.toml
+        shell: bash
+        run: |
+          echo -e '[compat]\njulia = "1.3"' >Project.toml
 
       - name: Test julia-version
         id: julia-version
         uses: ./
         with:
-          version: "1"
+          version: "min"
 
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.julia-version.outputs.version }}"
+      - name: Validate output
+        shell: bash
+        run: |
+          [[ "$version" == "1.3.0" ]] || exit 1
+        env:
+          version: ${{ steps.julia-version.outputs.version }}
