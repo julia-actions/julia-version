@@ -2,9 +2,7 @@
 name: CodeQL
 
 on:
-  pull_request:
-    branches:
-      - main
+  pull_request: {}
   push:
     branches:
       - main
