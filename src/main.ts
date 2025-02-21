@@ -71,8 +71,13 @@ export async function run(): Promise<void> {
       downloads = versionInfo[version].files
     }
 
-    process.env.CI && core.info(`version=${version}`)
     core.setOutput("version", version)
+
+    // Display output in CI logs to assist with debugging.
+    if (process.env.CI) {
+      core.info(`version=${version}`)
+    }
+
     // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
   } catch (error) {
     // Fail the workflow run if an error occurs

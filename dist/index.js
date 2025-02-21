@@ -41820,8 +41820,11 @@ async function run() {
             version = resolveJuliaVersion(versionSpecifier, availableReleases, includePrereleases, juliaCompatRange);
             downloads = versionInfo[version].files;
         }
-        process.env.CI && coreExports.info(`version=${version}`);
         coreExports.setOutput("version", version);
+        // Display output in CI logs to assist with debugging.
+        if (process.env.CI) {
+            coreExports.info(`version=${version}`);
+        }
         // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
     }
     catch (error) {
