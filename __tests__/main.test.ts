@@ -6,19 +6,10 @@
  * so that the actual '@actions/core' module is not imported.
  */
 import { jest } from "@jest/globals"
-import * as path from "node:path"
-import * as url from "node:url"
 import nock from "nock"
 
+import * as constants from "../__fixtures__/constants.js"
 import * as core from "../__fixtures__/core.js"
-
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
-const versionsJsonFile = path.join(
-  __dirname,
-  "..",
-  "__fixtures__",
-  "versions.json"
-)
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core)
@@ -55,7 +46,7 @@ describe("main.ts", () => {
     nock("https://julialang-s3.julialang.org")
       .persist()
       .get("/bin/versions.json")
-      .replyWithFile(200, versionsJsonFile)
+      .replyWithFile(200, constants.versionsJsonFile)
   })
 
   afterEach(() => {

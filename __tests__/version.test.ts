@@ -1,17 +1,17 @@
 /**
  * Unit tests for src/project.ts
  */
-import * as fs from "node:fs"
-import * as path from "node:path"
 import * as semver from "semver"
 
+import { testVersions } from "../__fixtures__/constants.js"
 import { resolveJuliaVersion } from "../src/version.js"
 
-const testVersions = Object.keys(
-  JSON.parse(fs.readFileSync(versionsJsonFile).toString())
-)
-
 describe("resolveJuliaVersion tests", () => {
+  // Will need to update these values if `__fixtures__/versions.json` is updated.
+  const latestRelease = "1.11.3"
+  const latestPre = "1.11.3"
+  const latestLts = "1.10.8"
+
   describe("specific versions", () => {
     it("Doesn't change the version when given a valid semver version", () => {
       expect(resolveJuliaVersion("1.0.5", [])).toEqual("1.0.5")
@@ -41,36 +41,38 @@ describe("resolveJuliaVersion tests", () => {
     })
 
     it("version alias: lts", () => {
-      // Update test when LTS is updated
-      expect(resolveJuliaVersion("lts", testVersions)).toEqual(
-        resolveJuliaVersion("1.10", testVersions)
-      )
-      expect(resolveJuliaVersion("lts", testVersions)).toEqual("1.10.5")
+      expect(resolveJuliaVersion("lts", testVersions)).toEqual(latestLts)
     })
 
     it("version alias: pre", () => {
-      expect(resolveJuliaVersion("pre", testVersions)).toEqual("1.11.0")
+      expect(resolveJuliaVersion("pre", testVersions)).toEqual(latestPre)
     })
   })
 
   describe("version ranges", () => {
     it("Chooses the highest available version that matches the input", () => {
-      expect(resolveJuliaVersion("1", testVersions)).toEqual("1.11.0")
+      expect(resolveJuliaVersion("1", testVersions)).toEqual(latestRelease)
       expect(resolveJuliaVersion("1.0", testVersions)).toEqual("1.0.5")
-      expect(resolveJuliaVersion("^1.3.0-rc1", testVersions)).toEqual("1.11.0")
-      expect(resolveJuliaVersion("^1.2.0-rc1", testVersions)).toEqual("1.11.0")
-      expect(resolveJuliaVersion("^1.10.0-rc1", testVersions)).toEqual("1.11.0")
+      expect(resolveJuliaVersion("^1.3.0-rc1", testVersions)).toEqual(
+        latestRelease
+      )
+      expect(resolveJuliaVersion("^1.2.0-rc1", testVersions)).toEqual(
+        latestRelease
+      )
+      expect(resolveJuliaVersion("^1.10.0-rc1", testVersions)).toEqual(
+        latestRelease
+      )
     })
   })
 
   describe("include-prereleases", () => {
     it("Chooses the highest available version that matches the input including prereleases", () => {
       expect(resolveJuliaVersion("^1.2.0-0", testVersions, true)).toEqual(
-        "1.11.0"
+        latestPre
       )
-      expect(resolveJuliaVersion("1", testVersions, true)).toEqual("1.11.0")
+      expect(resolveJuliaVersion("1", testVersions, true)).toEqual(latestPre)
       expect(resolveJuliaVersion("^1.2.0-0", testVersions, false)).toEqual(
-        "1.11.0"
+        latestPre
       )
     })
   })
