@@ -21375,7 +21375,7 @@
         "size": 133027218,
         "version": "1.9.0-beta4",
         "os": "freebsd",
-        "extension": "tar.gz.foo"
+        "extension": "tar.gz"
       }
     ],
     "stable": false
