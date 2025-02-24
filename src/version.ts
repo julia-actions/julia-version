@@ -115,7 +115,7 @@ export function resolveJuliaVersion(
     // TODO: Probably makes sense to throw this when the user provides a specifier which is out of bounds
     if (!version) {
       throw new Error(
-        `Could not find a Julia version that matches ${versionSpecifier}`
+        `No Julia version exists matching specifier: "${versionSpecifier}"`
       )
     }
   }

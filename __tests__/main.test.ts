@@ -78,7 +78,7 @@ describe("main.ts", () => {
     // Verify that the action was marked as failed.
     expect(core.setFailed).toHaveBeenNthCalledWith(
       1,
-      "Could not find a Julia version that matches unknown"
+      'No Julia version exists matching specifier: "unknown"'
     )
   })
 })

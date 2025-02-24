@@ -13,30 +13,45 @@ describe("resolveJuliaVersion tests", () => {
   const latestLts = "1.10.8"
 
   describe("specific versions", () => {
-    it("Doesn't change the version when given a valid semver version", () => {
-      expect(resolveJuliaVersion("1.0.5", [])).toEqual("1.0.5")
-      expect(resolveJuliaVersion("1.0.5", ["v1.0.5", "v1.0.6"])).toEqual(
+    it("Must return an available version", () => {
+      expect(() => resolveJuliaVersion("1.0.5", [])).toThrow("No Julia version exists")
+      expect(resolveJuliaVersion("1.0.5", ["1.0.5", "1.0.6"])).toEqual(
         "1.0.5"
       )
-      expect(resolveJuliaVersion("1.0.5", ["v1.0.4", "v1.0.5"])).toEqual(
+      expect(resolveJuliaVersion("1.0.5", ["1.0.4", "1.0.5"])).toEqual(
         "1.0.5"
       )
-      expect(resolveJuliaVersion("1.0.5", ["v1.0.4"])).toEqual("1.0.5")
-      expect(resolveJuliaVersion("1.3.0-alpha", [])).toEqual("1.3.0-alpha")
+      expect(() => resolveJuliaVersion("1.0.5", ["1.0.4"])).toThrow("No Julia version exists")
+
+      expect(() => resolveJuliaVersion("1.3.0-alpha", [])).toThrow("No Julia version exists")
       expect(
         resolveJuliaVersion("1.3.0-alpha", [
-          "v1.2.0",
-          "v1.3.0-alpha",
-          "v1.3.0-rc1",
-          "v1.3.0"
+          "1.2.0",
+          "1.3.0-alpha",
+          "1.3.0-rc1",
+          "1.3.0"
         ])
       ).toEqual("1.3.0-alpha")
-      expect(resolveJuliaVersion("1.3.0-rc2", [])).toEqual("1.3.0-rc2")
+    })
+
+    it("Respects v-prefix", () => {
+      expect(resolveJuliaVersion("1.0.5", ["v1.0.5", "v1.0.6"])).toEqual(
+        "v1.0.5"
+      )
+      expect(resolveJuliaVersion("1.0.5", ["v1.0.4", "v1.0.5"])).toEqual(
+        "v1.0.5"
+      )
+      expect(resolveJuliaVersion("v1.0.5", ["1.0.5", "1.0.6"])).toEqual(
+        "1.0.5"
+      )
+      expect(resolveJuliaVersion("v1.0.5", ["1.0.4", "1.0.5"])).toEqual(
+        "1.0.5"
+      )
     })
 
     it("version alias: nightly", () => {
       expect(() => resolveJuliaVersion("nightly", [])).toThrow(
-        "Could not find a Julia version that matches nightly"
+        'No Julia version exists matching specifier: "nightly"'
       )
     })
 
@@ -130,9 +145,7 @@ describe("resolveJuliaVersion tests", () => {
       )
 
       // NPM"s semver package treats "1.7" as "~1.7" instead of "^1.7" like Julia
-      expect(() => resolveJuliaVersion("min", vers, false, "1.7")).toThrow(
-        "Could not find a Julia version that matches"
-      )
+      expect(resolveJuliaVersion("min", vers, false, "1.7")).toBeNull()
 
       expect(() => resolveJuliaVersion("min", vers, true, "")).toThrow(
         "Julia project file does not specify a compat for Julia"
