@@ -70,7 +70,7 @@ export async function getJuliaVersionInfo(): Promise<JuliaVersionInfo> {
  * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
- * @param juliaCompatRange: The semver range to further restrict the results (TODO: We could probably roll this into versionSpecifier)
+ * @param juliaCompatRange: The semver range to further restrict the results
  * @returns The full semver version number
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
@@ -106,6 +106,8 @@ export function resolveJuliaVersion(
     version = semver.maxSatisfying(availableVersions, "*", {
       includePrerelease: true
     })
+  } else if (versionSpecifier === "x") {
+    version = null
   } else {
     // Use the highest available version that match the versionSpecifier
     version = semver.maxSatisfying(availableVersions, versionSpecifier, {

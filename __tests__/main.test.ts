@@ -18,7 +18,7 @@ jest.unstable_mockModule("@actions/core", () => core)
 // mocks are used in place of any actual dependencies.
 const { run } = await import("../src/main.js")
 
-describe("main.ts", () => {
+describe("run", () => {
   beforeEach(() => {
     // Set the action's inputs as return values from core.getInput().
     core.getInput.mockImplementation((name: string) => {
@@ -60,12 +60,9 @@ describe("main.ts", () => {
     // Verify the time output was set.
     expect(core.setOutput).toHaveBeenNthCalledWith(
       1,
-      "version",
-      // Basic regex to confirm the result is a valid semver string. The regex
-      // used isn't fully aligned with the semver spec but it's close enough
-      // for our purposes.
-      // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-      expect.stringMatching(/^\["\d+\.\d+\.\d+(?:-[0-9a-zA-Z.-]+)?"\]$/)
+      "versions",
+      // Regex to confirm that version output is a JSON list of version strings
+      expect.stringMatching(/^\["1\.\d+\.\d+"\]$/)
     )
   })
 

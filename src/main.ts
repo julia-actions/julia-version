@@ -2,6 +2,7 @@ import * as core from "@actions/core"
 import * as fs from "node:fs"
 import * as toml from "toml"
 
+import { parseVersionSpecifiers } from "./input.js"
 import { getJuliaProjectFile, getJuliaCompatRange } from "./project.js"
 import {
   getJuliaVersionInfo,
@@ -15,9 +16,9 @@ import {
  */
 export async function run(): Promise<void> {
   try {
-    const versionSpecifiers = core.getInput("version", {
+    const versionSpecifiers = parseVersionSpecifiers(core.getInput("version", {
       required: true
-    }).split("\n")
+    }))
     const includePrereleases = core.getBooleanInput("include-all-prereleases", {
       required: false
     })
@@ -69,12 +70,14 @@ export async function run(): Promise<void> {
         )
       }
 
+      core.debug(`${versionSpecifier} -> ${resolvedVersion}`)
+
       if (resolvedVersion !== null && !resolvedVersions.includes(resolvedVersion)) {
         resolvedVersions.push(resolvedVersion)
       }
     }
 
-    core.setOutput("version", JSON.stringify(resolvedVersions.sort()))
+    core.setOutput("versions", JSON.stringify(resolvedVersions.sort()))
 
     // Display output in CI logs to assist with debugging.
     if (process.env.CI) {
