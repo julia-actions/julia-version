@@ -14,13 +14,12 @@ inputs:
       passing in a scalar prefer using a string instead of a numeric value to
       avoid unwanted YAML decimal conversions (e.g. `1.10` will be interpreted
       as `1.1`).
-
-      Examples: `"1"`, `"1.10"`, "lts", `["min", "lts", "1"]`
     required: true
   project:
     description: >-
       The path to the Julia project directory or file to use when resolving some
-      versions (e.g. "min")'
+      specifiers (e.g. `min`). Defaults to using the environmental variable
+      `JULIA_PROJECT` if set or otherwise `.`.
     required: false
     default: "" # Empty string is a special value which falls back to using JULIA_PROJECT if defined, otherwise "."
   if-missing:

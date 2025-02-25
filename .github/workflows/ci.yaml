@@ -95,7 +95,7 @@ jobs:
     needs: version
     runs-on: ${{ matrix.os }}
     strategy:
-      fast-fail: false
+      fail-fast: false
       matrix:
         version: ${{ fromJSON(needs.version.outputs.json) }}
         os:
