@@ -95,12 +95,13 @@ jobs:
     needs: version
     runs-on: ${{ matrix.os }}
     strategy:
+      fast-fail: false
       matrix:
         version: ${{ fromJSON(needs.version.outputs.json) }}
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest-xlarge # Apple Silicon
+          - macos-latest
     steps:
       - uses: julia-actions/setup-julia@v2
         with:

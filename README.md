@@ -37,6 +37,8 @@ jobs:
             - 1    # Latest release
 
   test:
+    # e.g. `Julia 1.10.8 - ubuntu-latest`
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }}
     needs: version
     runs-on: ${{ matrix.os }}
     strategy:
@@ -45,7 +47,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest-xlarge # Apple Silicon
+          - macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
