@@ -97,7 +97,7 @@ this alias requires that the `project` input refers to a directory containing a
 
 Here is the complete Backus-Naur grammar for a version specifier:
 
-```
+```bnf
 specifier ::= tilde | caret | partial | nightly | alias
 tilde     ::= '~' partial
 caret     ::= '^' partial
