@@ -10,7 +10,7 @@ import { resolveVersionSpecifiers } from "./version.js"
 export async function run(): Promise<void> {
   try {
     const versionSpecifiers = parseVersionSpecifiers(
-      core.getInput("version", {
+      core.getInput("versions", {
         required: true
       })
     )
