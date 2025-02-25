@@ -31,15 +31,15 @@ export declare function getJuliaVersionInfo(): Promise<JuliaVersionInfo>;
  * - `min`: The earliest version of Julia within the `juliaCompatRange`.
  *
  * @param versionSpecifier: The version number specifier or alias.
- * @param availableReleases: An array of available Julia versions.
+ * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
- * @param juliaCompatRange: The semver range to further restrict the results (TODO: We could probably roll this into versionSpecifier)
+ * @param juliaCompatRange: The semver range to further restrict the results
  * @returns The full semver version number
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-export declare function resolveJuliaVersion(versionSpecifier: string, availableReleases: string[], includePrerelease?: boolean, juliaCompatRange?: string): string;
+export declare function resolveJuliaVersion(versionSpecifier: string, availableVersions: string[], includePrerelease?: boolean, juliaCompatRange?: string): string | null;
 /**
  * Generates a list of nightly downloads. Verifies the generated URLs exist
  * and avoids returning any entries which do not exist.

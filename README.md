@@ -1,4 +1,4 @@
-# Create a GitHub Action Using TypeScript
+# Julia Version
 
 [![GitHub Super-Linter](https://github.com/julia-action/julia-version/actions/workflows/linter.yaml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/julia-action/julia-version/actions/workflows/ci.yaml/badge.svg)
@@ -6,30 +6,106 @@
 [![CodeQL](https://github.com/julia-action/julia-version/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/julia-action/julia-version/actions/workflows/codeql-analysis.yaml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
-Use this template to bootstrap the creation of a TypeScript action. :rocket:
+Resolves a list of version specifiers into concrete Julia versions. The output
+from this action can be used as the input to a dependent GitHub Action job
+matrix to test Julia projects against a unique set of version numbers to avoid
+redundant matrix jobs. Additionally, by determining the concrete Julia versions
+before running the matrix jobs we can include a more descriptive version in the
+GitHub Action job name.
 
-This template includes compilation support, tests, a validation workflow,
-publishing, and versioning guidance.
+## Version Specifier Syntax
 
-If you are new, there's also a simpler introduction in the
-[Hello world JavaScript action repository](https://github.com/actions/hello-world-javascript-action).
+### Numeric Specifiers `1.2.3` `1.2` `1`
 
-## Create Your Own Action
+A numeric version syntatic sugar for the [tilde specifier](#tilde-specifier)
+(`1.2.3 == ~1.2.3`).
 
-To create your own action, you can use this repository as a template! Just
-follow the below instructions:
+The default here differs from the Julia version specifier which
+[use caret specifiers at the default](https://pkgdocs.julialang.org/v1/compatibility/#Version-specifier-format).
+This difference was done on purpose as this allows the use of the list
+`1.1, 1.2` being equivalent to `~1.1, ~1.2` instead of `^1 ^1`.
 
-1. Click the **Use this template** button at the top of the repository
-1. Select **Create a new repository**
-1. Select an owner and name for your new repository
-1. Click **Create repository**
-1. Clone your new repository
+### Tilde Specifiers `~1.2.3` `~1.2` `~1`
 
-> [!IMPORTANT]
->
-> Make sure to remove or update the [`CODEOWNERS`](./CODEOWNERS) file! For
-> details on how to use this file, see
-> [About code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
+Use the latest patch version when a minor version is specified. Allows minor
+version updates if not. These rules can be stated as these heuristics:
+
+- Minor and patch updates when the minor and patch versions are excluded (e.g.
+  `~0`, `~1`).
+- Patch updates when the minor is included (e.g. `~1.2.3`, `~1.2`)
+
+| Specifier | Range             | Updates Allowed |
+| :-------- | :---------------- | :-------------- |
+| `~1.2.3`  | `[1.2.3, 1.3.0-)` | Patch           |
+| `~1.2`    | `[1.2.0, 1.3.0-)` | Patch           |
+| `~1`      | `[1.0.0, 2.0.0-)` | Minor / Patch   |
+| `~0.2.3`  | `[0.2.3, 0.3.0-)` | Patch           |
+| `~0.2`    | `[0.2.0, 0.3.0-)` | Patch           |
+| `~0.0.3`  | `[0.0.3, 0.1.0-)` | Patch           |
+| `~0.0`    | `[0.0.0, 0.1.0-)` | Patch           |
+| `~0`      | `[0.0.0, 1.0.0-)` | Minor / Patch   |
+
+### Caret Specifiers `^1.2.3` `^0.2.3` `~0.0.3`
+
+Use the latest compatible non-breaking release. A non-breaking change follows
+the backwards compatible rules as specified by [Semantic Versioning 2.0.0].
+These rules can be stated as these heuristics:
+
+- Minor and patch updates when the minor and patch versions is excluded (e.g.
+  `^0`, `^1`) or the major version is non-zero (e.g. `^1`, `^1.2`, `^1.2.3`).
+- Patch updates when the patch version is excluded (e.g. `^0.2`, `^1.2`) or the
+  major version is zero and the minor version is non-zero (e.g. `^0.2`,
+  `^0.2.3`).
+- _No_ updates when the major and minor version is zero and the patch is
+  included (e.g. `^0.0.0`, `^0.0.3`)
+
+| Specifier | Range             | Updates Allowed |
+| :-------- | :---------------- | :-------------- |
+| `^1.2.3`  | `[1.2.3, 2.0.0-)` | Minor / Patch   |
+| `^1.2`    | `[1.2.0, 2.0.0-)` | Minor / Patch   |
+| `^1`      | `[1.0.0, 2.0.0-)` | Minor / Patch   |
+| `^0.2.3`  | `[0.2.3, 0.3.0-)` | Patch           |
+| `^0.2`    | `[0.2.0, 0.3.0-)` | Patch           |
+| `^0.0.3`  | `[0.0.3, 0.0.4-)` | None            |
+| `^0.0`    | `[0.0.0, 0.1.0-)` | Patch           |
+| `^0`      | `[0.0.0, 1.0.0-)` | Minor / Patch   |
+
+### Nightly Specifiers `nightly` `1.12-nightly`
+
+The `nightly` alias refers to the latest Julia build created from the `master`
+branch. A major and minor version maybe specified to refer to the latest build
+based upon the `release-<major>.<minor>` branch. When specifying a major and
+minor version typically only the latest three revisions are available (e.g. if
+`^1 == 1.11` then `1.10`, `1.11`, and `1.12`). Any nightly revisions which do
+not exist will resolve to `null`.
+
+### `lts` Alias
+
+Resolves to the current long-term stable (LTS) version of Julia.
+
+### `min` Alias
+
+Resolves to the lowest Julia version compatible with the Julia project. Using
+this alias requires that the `project` input refers to a directory containing a
+`Project.toml` (or `JuliaProject.toml`) and a `julia` compat entry exist.
+
+### Grammar
+
+Here is the complete Backus-Naur grammar for a version specifier:
+
+```
+specifier ::= tilde | caret | partial | nightly | alias
+tilde     ::= '~' partial
+caret     ::= '^' partial
+partial   ::= nr ( '.' nr ( '.' nr ) ? ) ?
+nightly   ::= ( nr '.' nr '-' ) ? 'nightly'
+alias     ::= 'lts' | 'min'
+nr        ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
+```
+
+Note we are purposefully not supporting the semver prerelease syntax at this
+time as we want to have prerelease support per-version specifier and have need
+to work through some details.
 
 ## Initial Setup
 
@@ -39,35 +115,33 @@ need to perform some initial setup steps before you can develop your action.
 > [!NOTE]
 >
 > You'll need to have a reasonably modern version of
-> [Node.js](https://nodejs.org) handy (20.x or later should work!). If you are
-> using a version manager like [`nodenv`](https://github.com/nodenv/nodenv) or
-> [`fnm`](https://github.com/Schniz/fnm), this template has a `.node-version`
+> [Node.js](https://nodejs.org) installed. If you are using a version manager
+> like [`nodenv`](https://github.com/nodenv/nodenv) or
+> [`fnm`](https://github.com/Schniz/fnm), this package has a `.node-version`
 > file at the root of the repository that can be used to automatically switch to
-> the correct version when you `cd` into the repository. Additionally, this
-> `.node-version` file is used by GitHub Actions in any `actions/setup-node`
-> actions.
+> the correct version when you `cd` into this repository.
 
-1. :hammer_and_wrench: Install the dependencies
+1. Install the dependencies
 
    ```bash
    npm install
    ```
 
-1. :building_construction: Package the TypeScript for distribution
+2. Package the TypeScript for distribution
 
    ```bash
    npm run bundle
    ```
 
-1. :white_check_mark: Run the tests
+3. Run the tests
 
    ```bash
    $ npm test
 
-   PASS  ./index.test.js
-     ✓ throws invalid number (3ms)
-     ✓ wait 500 ms (504ms)
-     ✓ test runs (95ms)
+    PASS  __tests__/main.test.ts
+     run
+       ✓ Sets the version output (30 ms)
+       ✓ Sets a failed status (8 ms)
 
    ...
    ```
