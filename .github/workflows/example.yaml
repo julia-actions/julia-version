@@ -1,0 +1,50 @@
+---
+name: Example
+on:
+  pull_requests: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  version:
+    name: Resolve Julia Versions
+    # These permissions are needed to:
+    # - Checkout the Git repository (`contents: read`)
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.julia-version.outputs.resolved }}
+    steps:
+      - uses: actions/checkout@v4 # Needed for "min" to access the Project.toml
+      - uses: ./
+        id: julia-version
+        with:
+          versions: |
+            - min  # Oldest supported version
+            - lts  # Long-Term Stable
+            - 1    # Latest release
+
+  test:
+    # e.g. `Julia 1.10.8 - ubuntu-latest`
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }}
+    needs: version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.version.outputs.json) }}
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - name: Julia version info
+        shell: julia --color=yes {0}
+        run: |
+          using InteractiveUtils
+          versioninfo()
