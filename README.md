@@ -62,6 +62,8 @@ jobs:
 
 ## Inputs
 
+<!-- markdownlint-disable MD033 -->
+
 | Name                 | Description | Required | Example |
 |:---------------------|:------------|:---------|:--------|
 | `versions`   | The Julia [version specifier](#version-specifier-syntax) or list of specifiers to resolve. Inputs formats supported include scalars, JSON lists, and YAML lists. When passing in a scalar prefer using a string instead of a numeric value to avoid unwanted YAML decimal conversions (e.g. `1.10` will be interpreted as `1.1`). | Yes | <pre><code class="language-yaml">"1.10"</code></pre> <pre><code class="language-json">["min", "lts", "1"]</code></pre> <pre><code class="language-yaml">- min&#10;- lts&#10;- 1&#10;</code></pre> |
@@ -73,6 +75,8 @@ jobs:
 | Name               | Description | Example |
 |:-------------------|:------------|:--------|
 | `resolved`         | The unique JSON list of resolved Julia versions. | <pre><code class="language-json">["1.0.0", "1.10.8", "1.11.3"]</code></pre> |
+
+<!-- markdownlint-enable MD033 -->
 
 ## Permissions
 
