@@ -1,5 +1,15 @@
 import YAML from "yaml"
 
+const _NR = /(?:0|[1-9])[0-9]*/
+const _NIGHTLY = new RegExp(`(?:${_NR.source}\\.${_NR.source}-)?nightly`)
+const _NUMERIC_VERSION = new RegExp(
+  `[\\^~]?${_NR.source}(?:\\.${_NR.source}(?:\\.${_NR.source})?)?`
+)
+const _ALIAS = /lts|min/
+const VERSION_SPECIFIER_REGEX = new RegExp(
+  `^(?:${_NUMERIC_VERSION.source}|${_NIGHTLY.source}|${_ALIAS.source})$`
+)
+
 export function parseVersionSpecifiers(raw: string): Array<string> {
   let specifiers: Array<string>
 
@@ -12,6 +22,12 @@ export function parseVersionSpecifiers(raw: string): Array<string> {
     specifiers = [yaml]
   } else {
     throw new Error(`Unable to parse "version" input:\n${raw}`)
+  }
+
+  for (const specifier of specifiers) {
+    if (!VERSION_SPECIFIER_REGEX.exec(specifier)) {
+      throw new Error(`Invalid version specifier provided: ${specifier}`)
+    }
   }
 
   return specifiers

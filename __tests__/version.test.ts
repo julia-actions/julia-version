@@ -2,7 +2,18 @@
  * Unit tests for src/version.ts
  */
 import { testVersions } from "../__fixtures__/constants.js"
-import { resolveVersionSpecifier } from "../src/version.js"
+import { resolveVersionSpecifier, versionSort } from "../src/version.js"
+
+describe("versionSort", () => {
+  it("Returns the proper order", () => {
+    const arr = ["5.5.1", "4.21.0", "4.22.0", "6.1.0", "5.1.0", "4.5.0"]
+    const expected = ["4.5.0", "4.21.0", "4.22.0", "5.1.0", "5.5.1", "6.1.0"]
+
+    expect(arr).not.toEqual(expected)
+    expect(arr.sort()).not.toEqual(expected)
+    expect(versionSort(arr)).toEqual(expected)
+  })
+})
 
 describe("resolveVersionSpecifier tests", () => {
   // Will need to update these values if `__fixtures__/versions.json` is updated.

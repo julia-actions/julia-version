@@ -34679,6 +34679,11 @@ var YAML = /*#__PURE__*/Object.freeze({
 	visitAsync: visitAsync
 });
 
+const _NR = /(?:0|[1-9])[0-9]*/;
+const _NIGHTLY = new RegExp(`(?:${_NR.source}\\.${_NR.source}-)?nightly`);
+const _NUMERIC_VERSION = new RegExp(`[\\^~]?${_NR.source}(?:\\.${_NR.source}(?:\\.${_NR.source})?)?`);
+const _ALIAS = /lts|min/;
+const VERSION_SPECIFIER_REGEX = new RegExp(`^(?:${_NUMERIC_VERSION.source}|${_NIGHTLY.source}|${_ALIAS.source})$`);
 function parseVersionSpecifiers(raw) {
     let specifiers;
     // Use schema failsafe to avoid YAML parsing of numbers. For example YAML
@@ -34692,6 +34697,11 @@ function parseVersionSpecifiers(raw) {
     }
     else {
         throw new Error(`Unable to parse "version" input:\n${raw}`);
+    }
+    for (const specifier of specifiers) {
+        if (!VERSION_SPECIFIER_REGEX.exec(specifier)) {
+            throw new Error(`Invalid version specifier provided: ${specifier}`);
+        }
     }
     return specifiers;
 }
@@ -49074,11 +49084,10 @@ const DEFAULT_NIGHTLY_PLATFORM = {
     arch: "x86_64",
     ext: "tar.gz"
 };
-// https://stackoverflow.com/questions/40201533/sort-version-dotted-number-strings-in-javascript
+// Based upon: https://stackoverflow.com/a/40201629
 function versionSort(versions) {
     return versions.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
-// var arr = ['5.5.1', '4.21.0', '4.22.0', '6.1.0', '5.1.0', '4.5.0'];
 async function resolveVersionSpecifiers(versionSpecifiers, project) {
     // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
     let juliaCompatRange = "";
@@ -49095,9 +49104,13 @@ async function resolveVersionSpecifiers(versionSpecifiers, project) {
         let resolvedVersion;
         // Nightlies are not included in the versions.json file
         const nightlyMatch = /^(?:(\d+\.\d+)-)?nightly$/.exec(versionSpecifier);
-        if (nightlyMatch) {
+        if (nightlyMatch && nightlyMatch[1]) {
             const url = getNightlyUrl(DEFAULT_NIGHTLY_PLATFORM, nightlyMatch[1]);
             resolvedVersion = (await urlExists(url)) ? versionSpecifier : null;
+        }
+        else if (nightlyMatch) {
+            // Skip URL check for "nightly" as it should always be available
+            resolvedVersion = versionSpecifier;
         }
         else {
             resolvedVersion = resolveVersionSpecifier(versionSpecifier, availableVersions, juliaCompatRange);

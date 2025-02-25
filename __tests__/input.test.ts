@@ -1,8 +1,47 @@
 import { parseVersionSpecifiers } from "../src/input.js"
 
 describe("parseVersionSpecifiers", () => {
-  it("Handle scalars", () => {
+  it("Handle numeric scalars", () => {
     expect(parseVersionSpecifiers("1")).toEqual(["1"])
+    expect(parseVersionSpecifiers("~1")).toEqual(["~1"])
+    expect(parseVersionSpecifiers("^1")).toEqual(["^1"])
+    expect(parseVersionSpecifiers("1.2")).toEqual(["1.2"])
+    expect(parseVersionSpecifiers("~1.2")).toEqual(["~1.2"])
+    expect(parseVersionSpecifiers("^1.2")).toEqual(["^1.2"])
+    expect(parseVersionSpecifiers("1.2.3")).toEqual(["1.2.3"])
+    expect(parseVersionSpecifiers("~1.2.3")).toEqual(["~1.2.3"])
+    expect(parseVersionSpecifiers("^1.2.3")).toEqual(["^1.2.3"])
+
+    expect(() => parseVersionSpecifiers("1.2.3-prerelease")).toThrow(
+      "Invalid version specifier"
+    )
+    expect(() => parseVersionSpecifiers("~1.2.3-prerelease")).toThrow(
+      "Invalid version specifier"
+    )
+    expect(() => parseVersionSpecifiers("^1.2.3-prerelease")).toThrow(
+      "Invalid version specifier"
+    )
+  })
+
+  it("Handle nightly scalar", () => {
+    expect(parseVersionSpecifiers("nightly")).toEqual(["nightly"])
+    expect(parseVersionSpecifiers("1.12-nightly")).toEqual(["1.12-nightly"])
+
+    expect(() => parseVersionSpecifiers("1-nightly")).toThrow(
+      "Invalid version specifier"
+    )
+    expect(() => parseVersionSpecifiers("1.12.0-nightly")).toThrow(
+      "Invalid version specifier"
+    )
+  })
+
+  it("Handle alias scalar", () => {
+    expect(parseVersionSpecifiers("lts")).toEqual(["lts"])
+    expect(parseVersionSpecifiers("min")).toEqual(["min"])
+
+    expect(() => parseVersionSpecifiers("pre")).toThrow(
+      "Invalid version specifier"
+    )
   })
 
   it("Handle JSON lists", () => {

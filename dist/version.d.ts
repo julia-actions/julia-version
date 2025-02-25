@@ -1,4 +1,4 @@
-export type Download = {
+type Download = {
     url: string;
     triplet?: string;
     kind: string;
@@ -22,6 +22,7 @@ type NightlyPlatform = {
     suffix?: string;
     ext: string;
 };
+export declare function versionSort(versions: Array<string>): Array<string>;
 export declare function resolveVersionSpecifiers(versionSpecifiers: Array<string>, project: string): Promise<Array<string>>;
 /**
  * Fetch and parse the Julia versions.json file.

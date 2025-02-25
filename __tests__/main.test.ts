@@ -75,7 +75,7 @@ describe("run", () => {
     // Verify that the action was marked as failed.
     expect(core.setFailed).toHaveBeenNthCalledWith(
       1,
-      'No Julia version exists matching specifier: "unknown"'
+      "Invalid version specifier provided: unknown"
     )
   })
 })

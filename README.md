@@ -74,10 +74,14 @@ These rules can be stated as these heuristics:
 
 The `nightly` alias refers to the latest Julia build created from the `master`
 branch. A major and minor version maybe specified to refer to the latest build
-based upon the `release-<major>.<minor>` branch. When specifying a major and
-minor version typically only the latest three revisions are available (e.g. if
-`^1 == 1.11` then `1.10`, `1.11`, and `1.12`). Any nightly revisions which do
-not exist will resolve to `null`.
+based upon the `release-<major>.<minor>` branch.
+
+When specifying a major and minor version typically only the latest three
+revisions are available (e.g. if `^1 == 1.11` then `1.10`, `1.11`, and `1.12`).
+The action will validate that a nightly with this specified version is available
+and if not the version will resolve to `null`.
+
+Note: May cause slowdown due to using HTTP HEAD request.
 
 ### `lts` Alias
 

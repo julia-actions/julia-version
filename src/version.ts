@@ -12,7 +12,7 @@ const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json"
 // TODO: Add marker to versions.json to indicate LTS?
 const LTS_VERSION = "1.10"
 
-export type Download = {
+type Download = {
   url: string
   triplet?: string
   kind: string
@@ -62,13 +62,12 @@ const DEFAULT_NIGHTLY_PLATFORM = {
   ext: "tar.gz"
 }
 
-// https://stackoverflow.com/questions/40201533/sort-version-dotted-number-strings-in-javascript
-function versionSort(versions: Array<string>): Array<string> {
+// Based upon: https://stackoverflow.com/a/40201629
+export function versionSort(versions: Array<string>): Array<string> {
   return versions.sort((a, b) =>
     a.localeCompare(b, undefined, { numeric: true })
   )
 }
-// var arr = ['5.5.1', '4.21.0', '4.22.0', '6.1.0', '5.1.0', '4.5.0'];
 
 export async function resolveVersionSpecifiers(
   versionSpecifiers: Array<string>,
@@ -94,9 +93,12 @@ export async function resolveVersionSpecifiers(
 
     // Nightlies are not included in the versions.json file
     const nightlyMatch = /^(?:(\d+\.\d+)-)?nightly$/.exec(versionSpecifier)
-    if (nightlyMatch) {
+    if (nightlyMatch && nightlyMatch[1]) {
       const url = getNightlyUrl(DEFAULT_NIGHTLY_PLATFORM, nightlyMatch[1])
       resolvedVersion = (await urlExists(url)) ? versionSpecifier : null
+    } else if (nightlyMatch) {
+      // Skip URL check for "nightly" as it should always be available
+      resolvedVersion = versionSpecifier
     } else {
       resolvedVersion = resolveVersionSpecifier(
         versionSpecifier,
