@@ -29,11 +29,11 @@ export async function run(): Promise<void> {
       { ifMissing }
     )
 
-    core.setOutput("versions", JSON.stringify(resolvedVersions))
+    core.setOutput("resolved", JSON.stringify(resolvedVersions))
 
     // Display output in CI logs to assist with debugging.
     if (process.env.CI) {
-      core.info(`versions=${JSON.stringify(resolvedVersions)}`)
+      core.info(`resolved=${JSON.stringify(resolvedVersions)}`)
     }
 
     // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))

@@ -29,7 +29,7 @@ inputs:
     required: false
     default: warn
 outputs:
-  versions:
+  resolved:
     description: The unique JSON list of resolved Julia versions.
 runs:
   using: node20

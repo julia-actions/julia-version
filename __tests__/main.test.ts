@@ -22,7 +22,7 @@ describe("run", () => {
   beforeEach(() => {
     // Set the action's inputs as return values from core.getInput().
     core.getInput.mockImplementation((name: string) => {
-      if (name === "version") {
+      if (name === "versions") {
         return "1"
       } else if (name === "project") {
         return ""
@@ -52,13 +52,13 @@ describe("run", () => {
     nock.cleanAll()
   })
 
-  it("Sets the version output", async () => {
+  it("Sets the resolved output", async () => {
     await run()
 
     // Verify the time output was set.
     expect(core.setOutput).toHaveBeenNthCalledWith(
       1,
-      "versions",
+      "resolved",
       // Regex to confirm that version output is a JSON list of version strings
       expect.stringMatching(/^\["1\.\d+\.\d+"\]$/)
     )

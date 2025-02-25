@@ -49220,7 +49220,7 @@ async function urlExists(url) {
  */
 async function run() {
     try {
-        const versionSpecifiers = parseVersionSpecifiers(coreExports.getInput("version", {
+        const versionSpecifiers = parseVersionSpecifiers(coreExports.getInput("versions", {
             required: true
         }));
         const juliaProject = coreExports.getInput("project", { required: false }) ||
@@ -49230,10 +49230,10 @@ async function run() {
         // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
         coreExports.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`);
         const resolvedVersions = await resolveVersionSpecifiers(versionSpecifiers, juliaProject, { ifMissing });
-        coreExports.setOutput("versions", JSON.stringify(resolvedVersions));
+        coreExports.setOutput("resolved", JSON.stringify(resolvedVersions));
         // Display output in CI logs to assist with debugging.
         if (process.env.CI) {
-            coreExports.info(`versions=${JSON.stringify(resolvedVersions)}`);
+            coreExports.info(`resolved=${JSON.stringify(resolvedVersions)}`);
         }
         // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
     }
