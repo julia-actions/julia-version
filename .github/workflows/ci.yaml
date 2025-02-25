@@ -82,7 +82,7 @@ jobs:
       - name: Create Project.toml
         shell: bash
         run: |
-          echo -e '[compat]\njulia = "1.6"' >Project.toml
+          echo -e '[compat]\njulia = "1.8"' >Project.toml
       - uses: ./
         id: julia-version
         with:
