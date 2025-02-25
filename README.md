@@ -58,7 +58,6 @@ jobs:
           versioninfo()
 ```
 
-
 ## Version Specifier Syntax
 
 ### Numeric Specifier
@@ -159,7 +158,11 @@ to work through some details.
 
 ## Permissions
 
-No [job permissions](https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs) are required to run this action. However, since `actions/checkout` is commonly used with this action to support the `min` version alias the `contents: read` permission is commonly granted.
+No
+[job permissions](https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs)
+are required to run this action. However, since `actions/checkout` is commonly
+used with this action to support the `min` version alias the `contents: read`
+permission is commonly granted.
 
 ## Initial Setup
 
