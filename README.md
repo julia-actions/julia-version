@@ -62,6 +62,7 @@ jobs:
 
 ## Inputs
 
+<!-- prettier-ignore-start -->
 <!-- markdownlint-disable MD033 -->
 
 | Name                 | Description | Required | Example |
@@ -77,6 +78,7 @@ jobs:
 | `resolved`         | The unique JSON list of resolved Julia versions. | <pre><code class="language-json">["1.0.0", "1.10.8", "1.11.3"]</code></pre> |
 
 <!-- markdownlint-enable MD033 -->
+<!-- prettier-ignore-end -->
 
 ## Permissions
 
