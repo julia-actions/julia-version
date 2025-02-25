@@ -19,6 +19,10 @@ GitHub Action job name.
 jobs:
   version:
     name: Resolve Julia Versions
+    # These permissions are needed to:
+    # - Checkout the Git repository (`contents: read`)
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       json: ${{ steps.julia-version.outputs.resolved }}
@@ -54,11 +58,12 @@ jobs:
           versioninfo()
 ```
 
+
 ## Version Specifier Syntax
 
-### Numeric Specifiers `1.2.3` `1.2` `1`
+### Numeric Specifier
 
-A numeric version syntatic sugar for the [tilde specifier](#tilde-specifier)
+A numeric version syntatic sugar for the [tilde specifier](#tilde-specifiers)
 (`1.2.3 == ~1.2.3`).
 
 The default here differs from the Julia version specifier which
@@ -66,7 +71,7 @@ The default here differs from the Julia version specifier which
 This difference was done on purpose as this allows the use of the list
 `1.1, 1.2` being equivalent to `~1.1, ~1.2` instead of `^1 ^1`.
 
-### Tilde Specifiers `~1.2.3` `~1.2` `~1`
+### Tilde Specifiers
 
 Use the latest patch version when a minor version is specified. Allows minor
 version updates if not. These rules can be stated as these heuristics:
@@ -86,7 +91,7 @@ version updates if not. These rules can be stated as these heuristics:
 | `~0.0`    | `[0.0.0, 0.1.0-)` | Patch           |
 | `~0`      | `[0.0.0, 1.0.0-)` | Minor / Patch   |
 
-### Caret Specifiers `^1.2.3` `^0.2.3` `~0.0.3`
+### Caret Specifiers
 
 Use the latest compatible non-breaking release. A non-breaking change follows
 the backward compatible rules as specified by [Semantic Versioning 2.0.0]. These
@@ -151,6 +156,10 @@ nr        ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
 Note we are purposefully not supporting the SemVer prerelease syntax at this
 time as we want to have prerelease support per-version specifier and have need
 to work through some details.
+
+## Permissions
+
+No [job permissions](https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs) are required to run this action. However, since `actions/checkout` is commonly used with this action to support the `min` version alias the `contents: read` permission is commonly granted.
 
 ## Initial Setup
 
