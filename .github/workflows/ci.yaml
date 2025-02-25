@@ -78,6 +78,7 @@ jobs:
     outputs:
       json: ${{ steps.julia-version.outputs.resolved }}
     steps:
+      - uses: actions/checkout@v4
       - name: Create Project.toml
         shell: bash
         run: |
