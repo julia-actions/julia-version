@@ -84,7 +84,10 @@ export function resolveJuliaVersion(
   // Note: `juliaCompatRange` is ignored unless `versionSpecifier` is `min`
   let version: string | null
 
-  if (semver.valid(versionSpecifier) == versionSpecifier && availableVersions.includes(versionSpecifier)) {
+  if (
+    semver.valid(versionSpecifier) == versionSpecifier &&
+    availableVersions.includes(versionSpecifier)
+  ) {
     // versionSpecifier is already a valid semver version (not a semver range)
     version = versionSpecifier
   } else if (versionSpecifier === "min") {
@@ -106,9 +109,12 @@ export function resolveJuliaVersion(
     version = semver.maxSatisfying(availableVersions, "*", {
       includePrerelease: true
     })
-  } else if (versionSpecifier === "x") {
-    version = null
   } else {
+    // versionSpecifier
+
+    // Use trailing - to indicate pre-release? Not compatable with NPM semver ranges
+    // or Julia Pkg.API.VersionRange
+
     // Use the highest available version that match the versionSpecifier
     version = semver.maxSatisfying(availableVersions, versionSpecifier, {
       includePrerelease

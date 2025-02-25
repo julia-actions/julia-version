@@ -4,10 +4,7 @@ import * as toml from "toml"
 
 import { parseVersionSpecifiers } from "./input.js"
 import { getJuliaProjectFile, getJuliaCompatRange } from "./project.js"
-import {
-  getJuliaVersionInfo,
-  resolveJuliaVersion,
-} from "./version.js"
+import { getJuliaVersionInfo, resolveJuliaVersion } from "./version.js"
 
 /**
  * The main function for the action.
@@ -16,9 +13,11 @@ import {
  */
 export async function run(): Promise<void> {
   try {
-    const versionSpecifiers = parseVersionSpecifiers(core.getInput("version", {
-      required: true
-    }))
+    const versionSpecifiers = parseVersionSpecifiers(
+      core.getInput("version", {
+        required: true
+      })
+    )
     const includePrereleases = core.getBooleanInput("include-all-prereleases", {
       required: false
     })
@@ -72,7 +71,10 @@ export async function run(): Promise<void> {
 
       core.debug(`${versionSpecifier} -> ${resolvedVersion}`)
 
-      if (resolvedVersion !== null && !resolvedVersions.includes(resolvedVersion)) {
+      if (
+        resolvedVersion !== null &&
+        !resolvedVersions.includes(resolvedVersion)
+      ) {
         resolvedVersions.push(resolvedVersion)
       }
     }

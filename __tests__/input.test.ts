@@ -13,7 +13,11 @@ describe("parseVersionSpecifiers", () => {
     expect(parseVersionSpecifiers('["1","2","3"]')).toEqual(["1", "2", "3"])
     expect(parseVersionSpecifiers("[1,2,3]")).toEqual(["1", "2", "3"])
     expect(parseVersionSpecifiers("- 1\n- 2\n- 3")).toEqual(["1", "2", "3"])
-    expect(parseVersionSpecifiers('- "1"\n- "2"\n- "3"')).toEqual(["1", "2", "3"])
+    expect(parseVersionSpecifiers('- "1"\n- "2"\n- "3"')).toEqual([
+      "1",
+      "2",
+      "3"
+    ])
   })
 
   it("Avoid YAML number parsing", async () => {

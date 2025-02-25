@@ -14,16 +14,18 @@ describe("resolveJuliaVersion tests", () => {
 
   describe("specific versions", () => {
     it("Must return an available version", () => {
-      expect(() => resolveJuliaVersion("1.0.5", [])).toThrow("No Julia version exists")
-      expect(resolveJuliaVersion("1.0.5", ["1.0.5", "1.0.6"])).toEqual(
-        "1.0.5"
+      expect(() => resolveJuliaVersion("1.0.5", [])).toThrow(
+        "No Julia version exists"
       )
-      expect(resolveJuliaVersion("1.0.5", ["1.0.4", "1.0.5"])).toEqual(
-        "1.0.5"
+      expect(resolveJuliaVersion("1.0.5", ["1.0.5", "1.0.6"])).toEqual("1.0.5")
+      expect(resolveJuliaVersion("1.0.5", ["1.0.4", "1.0.5"])).toEqual("1.0.5")
+      expect(() => resolveJuliaVersion("1.0.5", ["1.0.4"])).toThrow(
+        "No Julia version exists"
       )
-      expect(() => resolveJuliaVersion("1.0.5", ["1.0.4"])).toThrow("No Julia version exists")
 
-      expect(() => resolveJuliaVersion("1.3.0-alpha", [])).toThrow("No Julia version exists")
+      expect(() => resolveJuliaVersion("1.3.0-alpha", [])).toThrow(
+        "No Julia version exists"
+      )
       expect(
         resolveJuliaVersion("1.3.0-alpha", [
           "1.2.0",
@@ -41,12 +43,8 @@ describe("resolveJuliaVersion tests", () => {
       expect(resolveJuliaVersion("1.0.5", ["v1.0.4", "v1.0.5"])).toEqual(
         "v1.0.5"
       )
-      expect(resolveJuliaVersion("v1.0.5", ["1.0.5", "1.0.6"])).toEqual(
-        "1.0.5"
-      )
-      expect(resolveJuliaVersion("v1.0.5", ["1.0.4", "1.0.5"])).toEqual(
-        "1.0.5"
-      )
+      expect(resolveJuliaVersion("v1.0.5", ["1.0.5", "1.0.6"])).toEqual("1.0.5")
+      expect(resolveJuliaVersion("v1.0.5", ["1.0.4", "1.0.5"])).toEqual("1.0.5")
     })
 
     it("version alias: nightly", () => {

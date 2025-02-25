@@ -9,9 +9,13 @@ branding:
 inputs:
   version:
     description: >-
-      The Julia version specifier to use. Prefer using strings instead of
-      numeric values avoid unwanted YAML decimal conversions (e.g. `1.10` would
-      will be interpreted as `1.1`). Examples: "1", "1.10", "lts", and "pre".
+      The Julia version specifier or list of specifiers to resolve. Inputs
+      formats supported include scalars, JSON lists, and YAML lists. When
+      passing in a scalar prefer using a string instead of a numeric value to
+      avoid unwanted YAML decimal conversions (e.g. `1.10` will be interpreted
+      as `1.1`).
+
+      Examples: `"1"`, `"1.10"`, "lts", `["min", "lts", "1"]`
     required: true
   include-all-prereleases:
     description: >-
