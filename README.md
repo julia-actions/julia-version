@@ -13,6 +13,47 @@ redundant matrix jobs. Additionally, by determining the concrete Julia versions
 before running the matrix jobs we can include a more descriptive version in the
 GitHub Action job name.
 
+## Examples
+
+```yaml
+jobs:
+  version:
+    name: Resolve Julia Versions
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.julia-version.outputs.resolved }}
+    steps:
+      - uses: actions/checkout@v4  # Needed for "min" to access the Project.toml
+      - uses: julia-actions/julia-version@cv/implementation
+        id: julia-version
+        with:
+          versions: |
+            - min  # Oldest supported version
+            - lts  # Long-Term Stable
+            - 1    # Latest release
+
+  test:
+    needs: version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.version.outputs.json) }}
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest-xlarge  # Apple Silicon
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - name: Julia version info
+        shell: julia --color=yes {0}
+        run: |
+          using InteractiveUtils
+          versioninfo()
+```
+
 ## Version Specifier Syntax
 
 ### Numeric Specifiers `1.2.3` `1.2` `1`
