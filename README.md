@@ -48,8 +48,8 @@ version updates if not. These rules can be stated as these heuristics:
 ### Caret Specifiers `^1.2.3` `^0.2.3` `~0.0.3`
 
 Use the latest compatible non-breaking release. A non-breaking change follows
-the backward compatible rules as specified by [Semantic Versioning 2.0.0].
-These rules can be stated as these heuristics:
+the backward compatible rules as specified by [Semantic Versioning 2.0.0]. These
+rules can be stated as these heuristics:
 
 - Minor and patch updates when the minor and patch versions is excluded (e.g.
   `^0`, `^1`) or the major version is non-zero (e.g. `^1`, `^1.2`, `^1.2.3`).
@@ -358,7 +358,7 @@ enable the workflow, follow the below steps.
    #     - main
    ```
 
-1. Save and commit the changes
+3. Save and commit the changes
 
 Once complete, this workflow will run any time a pull request is created or
 changes pushed directly to `main`. If the workflow detects any dependencies with
