@@ -23,7 +23,7 @@ jobs:
     outputs:
       json: ${{ steps.julia-version.outputs.resolved }}
     steps:
-      - uses: actions/checkout@v4  # Needed for "min" to access the Project.toml
+      - uses: actions/checkout@v4 # Needed for "min" to access the Project.toml
       - uses: julia-actions/julia-version@cv/implementation
         id: julia-version
         with:
@@ -41,7 +41,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest-xlarge  # Apple Silicon
+          - macos-latest-xlarge # Apple Silicon
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2

@@ -67,4 +67,14 @@ describe("parseVersionSpecifiers", () => {
   it("Do not support arbitrary YAML", async () => {
     expect(() => parseVersionSpecifiers('- "1": {}')).toThrow("Unable to parse")
   })
+
+  it("Ignores comments", () => {
+    // String is also intended which is not required for the test
+    const versions = `
+      - min  # Oldest supported version
+      - lts  # Long-Term Stable
+      - 1    # Latest release`
+
+    expect(parseVersionSpecifiers(versions)).toEqual(["min", "lts", "1"])
+  })
 })
