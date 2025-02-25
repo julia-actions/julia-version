@@ -58,6 +58,35 @@ jobs:
           versioninfo()
 ```
 
+## Inputs
+
+The Julia version specifier or list of specifiers to resolve. Inputs
+      formats supported include scalars, JSON lists, and YAML lists. When
+      passing in a scalar prefer using a string instead of a numeric value to
+      avoid unwanted YAML decimal conversions (e.g. `1.10` will be interpreted
+      as `1.1`).
+
+      Examples: `"1"`, `"1.10"`, "lts", `["min", "lts", "1"]`
+
+| Name                 | Description | Required | Example |
+|:---------------------|:------------|:---------|:--------|
+| `versions`   | The Julia [version specifier](#version-specifier-syntax) or list of specifiers to resolve. Inputs formats supported include scalars, JSON lists, and YAML lists. When passing in a scalar prefer using a string instead of a numeric value to avoid unwanted YAML decimal conversions (e.g. `1.10` will be interpreted as `1.1`). | Yes | Examples: `"1.10"` <pre><code class="language-json">["min", "lts", "1"]</code></pre> <pre><code class="language-yaml">- min&#10;- lts&#10;- 1&#10;</code></pre> |
+| `project`            | The path to the Julia project directory or file to use when resolving some
+      specifiers (e.g. "min"). Falls back on the environmental variable `JULIA_PROJECT` if defined. | No | `.` |
+| `if-missing`         | Determine the behavior if a version specifier cannot be resolved. | No | `warn`, `error` |
+
+## Outputs
+
+| Name               | Description | Example |
+|:-------------------|:------------|:--------|
+| `resolved`         | The unique JSON list of resolved Julia versions. | <pre><code class="language-json">["min", "lts", "1"]</code></pre> |
+
+## Permissions
+
+No [job permissions] are required to run this action. However, since
+`actions/checkout` is commonly used with this action to support the `min`
+version alias the `contents: read` permission is commonly granted.
+
 ## Version Specifier Syntax
 
 ### Numeric Specifier
@@ -155,12 +184,6 @@ nr        ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
 Note we are purposefully not supporting the SemVer prerelease syntax at this
 time as we want to have prerelease support per-version specifier and have need
 to work through some details.
-
-## Permissions
-
-No [job permissions] are required to run this action. However, since
-`actions/checkout` is commonly used with this action to support the `min`
-version alias the `contents: read` permission is commonly granted.
 
 [job permissions]:
   https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
