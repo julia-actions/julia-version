@@ -22,22 +22,15 @@ describe("resolveVersionSpecifier tests", () => {
 
   describe("specific versions", () => {
     it("Must return an available version", () => {
-      expect(() => resolveVersionSpecifier("1.0.5", [])).toThrow(
-        "No Julia version exists"
-      )
+      expect(resolveVersionSpecifier("1.0.5", [])).toBeNull()
       expect(resolveVersionSpecifier("1.0.5", ["1.0.5", "1.0.6"])).toEqual(
         "1.0.5"
       )
       expect(resolveVersionSpecifier("1.0.5", ["1.0.4", "1.0.5"])).toEqual(
         "1.0.5"
       )
-      expect(() => resolveVersionSpecifier("1.0.5", ["1.0.4"])).toThrow(
-        "No Julia version exists"
-      )
-
-      expect(() => resolveVersionSpecifier("1.3.0-alpha", [])).toThrow(
-        "No Julia version exists"
-      )
+      expect(resolveVersionSpecifier("1.0.5", ["1.0.4"])).toBeNull()
+      expect(resolveVersionSpecifier("1.3.0-alpha", [])).toBeNull()
       expect(
         resolveVersionSpecifier("1.3.0-alpha", [
           "1.2.0",
@@ -64,9 +57,7 @@ describe("resolveVersionSpecifier tests", () => {
     })
 
     it("version alias: nightly", () => {
-      expect(() => resolveVersionSpecifier("nightly", [])).toThrow(
-        'No Julia version exists matching specifier: "nightly"'
-      )
+      expect(resolveVersionSpecifier("nightly", [])).toBeNull()
     })
 
     it("version alias: lts", () => {

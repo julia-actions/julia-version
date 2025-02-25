@@ -71,7 +71,8 @@ export function versionSort(versions: Array<string>): Array<string> {
 
 export async function resolveVersionSpecifiers(
   versionSpecifiers: Array<string>,
-  project: string
+  project: string,
+  options?: { ifMissing: string }
 ): Promise<Array<string>> {
   // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
   let juliaCompatRange: string = ""
@@ -80,6 +81,9 @@ export async function resolveVersionSpecifiers(
     const juliaProjectToml = toml.parse(
       fs.readFileSync(juliaProjectFile).toString()
     )
+
+    // Extract the compat range for the "julia" entry and convert it to the
+    // node semver range syntax.
     juliaCompatRange = getJuliaCompatRange(juliaProjectToml)
     core.debug(`Julia project compatibility range: ${juliaCompatRange}`)
   }
@@ -109,11 +113,18 @@ export async function resolveVersionSpecifiers(
 
     core.debug(`${versionSpecifier} -> ${resolvedVersion}`)
 
-    if (
-      resolvedVersion !== null &&
-      !resolvedVersions.includes(resolvedVersion)
-    ) {
-      resolvedVersions.push(resolvedVersion)
+    if (resolvedVersion) {
+      if (!resolvedVersions.includes(resolvedVersion)) {
+        resolvedVersions.push(resolvedVersion)
+      }
+    } else if (options?.ifMissing === "warn") {
+      core.warning(
+        `No Julia version exists matching specifier: "${versionSpecifier}"`
+      )
+    } else {
+      throw new Error(
+        `No Julia version exists matching specifier: "${versionSpecifier}"`
+      )
     }
   }
 
@@ -151,37 +162,33 @@ export async function fetchJuliaVersionsJson(): Promise<JuliaVersionsJson> {
 }
 
 /**
- * Determine the latest Julia release associated with the version specifier
+ * Determine the latest Julia release associated with the version range
  * (e.g. "1", "^1.2.3", "~1.2.3"). Additionally, supports the version aliases:
  *
  * - `lts`: The latest released long-term stable (LTS) version of Julia.
- * - `pre`: The latest prerelease (or release) of Julia.
  * - `min`: The earliest version of Julia within the `juliaCompatRange`.
  *
- * @param versionSpecifier: The version number specifier or alias.
+ * @param versionRange: The node version range or alias.
  * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
- * @param juliaCompatRange: The semver range to further restrict the results
+ * @param juliaCompatRange: The Node semver range to further restrict the results
  * @returns The full semver version number
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
 export function resolveVersionSpecifier(
-  versionSpecifier: string,
+  versionRange: string,
   availableVersions: string[],
-  juliaCompatRange: string = ""
+  juliaCompatRange: string | null = null
 ): string | null {
-  // Note: `juliaCompatRange` is ignored unless `versionSpecifier` is `min`
-  let version: string | null
-
   if (
-    semver.valid(versionSpecifier) == versionSpecifier &&
-    availableVersions.includes(versionSpecifier)
+    semver.valid(versionRange) == versionRange &&
+    availableVersions.includes(versionRange)
   ) {
-    // versionSpecifier is already a valid semver version (not a semver range)
-    version = versionSpecifier
-  } else if (versionSpecifier === "min") {
+    // versionRange is already a valid semver version (not a semver range)
+    return versionRange
+  } else if (versionRange === "min") {
     // Resolve "min" to the minimum supported Julia version compatible with the
     // project file
     if (!juliaCompatRange) {
@@ -189,27 +196,13 @@ export function resolveVersionSpecifier(
         'Unable to use version "min" when the Julia project file does not specify a compat for Julia'
       )
     }
-    version = semver.minSatisfying(availableVersions, juliaCompatRange)
-  } else if (versionSpecifier === "lts") {
-    version = semver.maxSatisfying(availableVersions, LTS_VERSION)
+    return semver.minSatisfying(availableVersions, juliaCompatRange)
+  } else if (versionRange === "lts") {
+    return semver.maxSatisfying(availableVersions, LTS_VERSION)
   } else {
-    // versionSpecifier
-
-    // Use trailing - to indicate pre-release? Not compatable with NPM semver ranges
-    // or Julia Pkg.API.VersionRange
-
-    // Use the highest available version that match the versionSpecifier
-    version = semver.maxSatisfying(availableVersions, versionSpecifier)
-
-    // TODO: Probably makes sense to throw this when the user provides a specifier which is out of bounds
-    if (!version) {
-      throw new Error(
-        `No Julia version exists matching specifier: "${versionSpecifier}"`
-      )
-    }
+    // Use the highest available version that match the version range
+    return semver.maxSatisfying(availableVersions, versionRange)
   }
-
-  return version
 }
 
 export function getNightlyUrl(

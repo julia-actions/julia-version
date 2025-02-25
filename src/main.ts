@@ -14,36 +14,26 @@ export async function run(): Promise<void> {
         required: true
       })
     )
-    const includePrereleases = core.getBooleanInput("include-all-prereleases", {
-      required: false
-    })
     const juliaProject =
       core.getInput("project", { required: false }) ||
       process.env.JULIA_PROJECT ||
       "."
+    const ifMissing = core.getInput("if-missing", { required: false })
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    const inputs = JSON.stringify(
-      {
-        versionSpecifiers,
-        includePrereleases,
-        juliaProject
-      },
-      null,
-      4
-    )
-    core.debug(`User inputs: ${inputs}`)
+    core.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`)
 
     const resolvedVersions = await resolveVersionSpecifiers(
       versionSpecifiers,
-      juliaProject
+      juliaProject,
+      { ifMissing }
     )
 
     core.setOutput("versions", JSON.stringify(resolvedVersions))
 
     // Display output in CI logs to assist with debugging.
     if (process.env.CI) {
-      core.info(`version=${JSON.stringify(resolvedVersions)}`)
+      core.info(`versions=${JSON.stringify(resolvedVersions)}`)
     }
 
     // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))

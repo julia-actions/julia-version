@@ -7,7 +7,7 @@ branding:
   icon: filter
   color: purple
 inputs:
-  version:
+  versions:
     description: >-
       The Julia version specifier or list of specifiers to resolve. Inputs
       formats supported include scalars, JSON lists, and YAML lists. When
@@ -17,22 +17,20 @@ inputs:
 
       Examples: `"1"`, `"1.10"`, "lts", `["min", "lts", "1"]`
     required: true
-  include-all-prereleases:
-    description: >-
-      Include prereleases when matching the Julia version specifier.
-    default: "false"
   project:
     description: >-
       The path to the Julia project directory or file to use when resolving some
       versions (e.g. "min")'
     required: false
     default: "" # Empty string is a special value which falls back to using JULIA_PROJECT if defined, otherwise "."
+  if-missing:
+    description: >-
+      Determine the behavior if a version specifier cannot be resolved.
+    required: false
+    default: warn
 outputs:
-  version:
-    description: The resolved Julia version
-  downloads-json:
-    description:
-      JSON list of downlaods available for the specified Julia version
+  versions:
+    description: The unique JSON list of resolved Julia versions.
 runs:
   using: node20
   main: dist/index.js

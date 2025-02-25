@@ -26,6 +26,8 @@ describe("run", () => {
         return "1"
       } else if (name === "project") {
         return ""
+      } else if (name === "if-missing") {
+        return "error"
       } else {
         throw new Error(`Unknown input name ${name}`)
       }
@@ -33,11 +35,7 @@ describe("run", () => {
 
     // Set the action's inputs as return values from core.getBooleanInput().
     core.getBooleanInput.mockImplementation((name: string) => {
-      if (name === "include-all-prereleases") {
-        return false
-      } else {
-        throw new Error(`Unknown boolean input name ${name}`)
-      }
+      throw new Error(`Unknown boolean input name ${name}`)
     })
 
     // Instead of downloading versions.json, use `__fixtures__/versions.json`.
@@ -75,7 +73,7 @@ describe("run", () => {
     // Verify that the action was marked as failed.
     expect(core.setFailed).toHaveBeenNthCalledWith(
       1,
-      "Invalid version specifier provided: unknown"
+      'Invalid version specifier provided: "unknown"'
     )
   })
 })

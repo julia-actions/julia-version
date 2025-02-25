@@ -34700,7 +34700,7 @@ function parseVersionSpecifiers(raw) {
     }
     for (const specifier of specifiers) {
         if (!VERSION_SPECIFIER_REGEX.exec(specifier)) {
-            throw new Error(`Invalid version specifier provided: ${specifier}`);
+            throw new Error(`Invalid version specifier provided: "${specifier}"`);
         }
     }
     return specifiers;
@@ -49088,12 +49088,14 @@ const DEFAULT_NIGHTLY_PLATFORM = {
 function versionSort(versions) {
     return versions.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
-async function resolveVersionSpecifiers(versionSpecifiers, project) {
+async function resolveVersionSpecifiers(versionSpecifiers, project, options) {
     // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
     let juliaCompatRange = "";
     if (versionSpecifiers.includes("min")) {
         const juliaProjectFile = getJuliaProjectFile(project);
         const juliaProjectToml = tomlExports.parse(fs.readFileSync(juliaProjectFile).toString());
+        // Extract the compat range for the "julia" entry and convert it to the
+        // node semver range syntax.
         juliaCompatRange = getJuliaCompatRange(juliaProjectToml);
         coreExports.debug(`Julia project compatibility range: ${juliaCompatRange}`);
     }
@@ -49116,9 +49118,16 @@ async function resolveVersionSpecifiers(versionSpecifiers, project) {
             resolvedVersion = resolveVersionSpecifier(versionSpecifier, availableVersions, juliaCompatRange);
         }
         coreExports.debug(`${versionSpecifier} -> ${resolvedVersion}`);
-        if (resolvedVersion !== null &&
-            !resolvedVersions.includes(resolvedVersion)) {
-            resolvedVersions.push(resolvedVersion);
+        if (resolvedVersion) {
+            if (!resolvedVersions.includes(resolvedVersion)) {
+                resolvedVersions.push(resolvedVersion);
+            }
+        }
+        else if (options?.ifMissing === "warn") {
+            coreExports.warning(`No Julia version exists matching specifier: "${versionSpecifier}"`);
+        }
+        else {
+            throw new Error(`No Julia version exists matching specifier: "${versionSpecifier}"`);
         }
     }
     return versionSort(resolvedVersions);
@@ -49146,53 +49155,42 @@ async function fetchJuliaVersionsJson() {
     return JSON.parse(versionsFile);
 }
 /**
- * Determine the latest Julia release associated with the version specifier
+ * Determine the latest Julia release associated with the version range
  * (e.g. "1", "^1.2.3", "~1.2.3"). Additionally, supports the version aliases:
  *
  * - `lts`: The latest released long-term stable (LTS) version of Julia.
- * - `pre`: The latest prerelease (or release) of Julia.
  * - `min`: The earliest version of Julia within the `juliaCompatRange`.
  *
- * @param versionSpecifier: The version number specifier or alias.
+ * @param versionRange: The node version range or alias.
  * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
- * @param juliaCompatRange: The semver range to further restrict the results
+ * @param juliaCompatRange: The Node semver range to further restrict the results
  * @returns The full semver version number
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-function resolveVersionSpecifier(versionSpecifier, availableVersions, juliaCompatRange = "") {
-    // Note: `juliaCompatRange` is ignored unless `versionSpecifier` is `min`
-    let version;
-    if (semverExports.valid(versionSpecifier) == versionSpecifier &&
-        availableVersions.includes(versionSpecifier)) {
-        // versionSpecifier is already a valid semver version (not a semver range)
-        version = versionSpecifier;
+function resolveVersionSpecifier(versionRange, availableVersions, juliaCompatRange = null) {
+    if (semverExports.valid(versionRange) == versionRange &&
+        availableVersions.includes(versionRange)) {
+        // versionRange is already a valid semver version (not a semver range)
+        return versionRange;
     }
-    else if (versionSpecifier === "min") {
+    else if (versionRange === "min") {
         // Resolve "min" to the minimum supported Julia version compatible with the
         // project file
         if (!juliaCompatRange) {
             throw new Error('Unable to use version "min" when the Julia project file does not specify a compat for Julia');
         }
-        version = semverExports.minSatisfying(availableVersions, juliaCompatRange);
+        return semverExports.minSatisfying(availableVersions, juliaCompatRange);
     }
-    else if (versionSpecifier === "lts") {
-        version = semverExports.maxSatisfying(availableVersions, LTS_VERSION);
+    else if (versionRange === "lts") {
+        return semverExports.maxSatisfying(availableVersions, LTS_VERSION);
     }
     else {
-        // versionSpecifier
-        // Use trailing - to indicate pre-release? Not compatable with NPM semver ranges
-        // or Julia Pkg.API.VersionRange
-        // Use the highest available version that match the versionSpecifier
-        version = semverExports.maxSatisfying(availableVersions, versionSpecifier);
-        // TODO: Probably makes sense to throw this when the user provides a specifier which is out of bounds
-        if (!version) {
-            throw new Error(`No Julia version exists matching specifier: "${versionSpecifier}"`);
-        }
+        // Use the highest available version that match the version range
+        return semverExports.maxSatisfying(availableVersions, versionRange);
     }
-    return version;
 }
 function getNightlyUrl(nightly, majorMinorVersion = null) {
     const majorMinorDir = majorMinorVersion ? majorMinorVersion + "/" : "";
@@ -49225,24 +49223,17 @@ async function run() {
         const versionSpecifiers = parseVersionSpecifiers(coreExports.getInput("version", {
             required: true
         }));
-        const includePrereleases = coreExports.getBooleanInput("include-all-prereleases", {
-            required: false
-        });
         const juliaProject = coreExports.getInput("project", { required: false }) ||
             process.env.JULIA_PROJECT ||
             ".";
+        const ifMissing = coreExports.getInput("if-missing", { required: false });
         // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-        const inputs = JSON.stringify({
-            versionSpecifiers,
-            includePrereleases,
-            juliaProject
-        }, null, 4);
-        coreExports.debug(`User inputs: ${inputs}`);
-        const resolvedVersions = await resolveVersionSpecifiers(versionSpecifiers, juliaProject);
+        coreExports.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`);
+        const resolvedVersions = await resolveVersionSpecifiers(versionSpecifiers, juliaProject, { ifMissing });
         coreExports.setOutput("versions", JSON.stringify(resolvedVersions));
         // Display output in CI logs to assist with debugging.
         if (process.env.CI) {
-            coreExports.info(`version=${JSON.stringify(resolvedVersions)}`);
+            coreExports.info(`versions=${JSON.stringify(resolvedVersions)}`);
         }
         // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
     }

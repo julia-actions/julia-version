@@ -26,7 +26,7 @@ export function parseVersionSpecifiers(raw: string): Array<string> {
 
   for (const specifier of specifiers) {
     if (!VERSION_SPECIFIER_REGEX.exec(specifier)) {
-      throw new Error(`Invalid version specifier provided: ${specifier}`)
+      throw new Error(`Invalid version specifier provided: "${specifier}"`)
     }
   }
 
