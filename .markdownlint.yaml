@@ -1,5 +1,5 @@
 # See: https://github.com/DavidAnson/markdownlint
-# https://github.com/updownpress/markdown-lint/tree/master/rules
+# For details on rules see: https://github.com/updownpress/markdown-lint/tree/master/rules
 ---
 # Unordered list style
 MD004:
