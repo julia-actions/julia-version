@@ -197,7 +197,6 @@ steps:
     with:
       milliseconds: 1000
 
-
   - name: Print Output
     id: output
     run: echo "${{ steps.test-action.outputs.time }}"

@@ -17,12 +17,12 @@ const __dirname = path.dirname(__filename)
 const compat = new FlatCompat({
   baseDirectory: __dirname,
   recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all
+  allConfig: js.configs.all,
 })
 
 export default [
   {
-    ignores: ["**/coverage", "**/dist", "**/linter", "**/node_modules"]
+    ignores: ["**/coverage", "**/dist", "**/linter", "**/node_modules"],
   },
   ...compat.extends(
     "eslint:recommended",
@@ -36,7 +36,7 @@ export default [
       import: fixupPluginRules(_import),
       jest,
       prettier,
-      "@typescript-eslint": typescriptEslint
+      "@typescript-eslint": typescriptEslint,
     },
 
     languageOptions: {
@@ -44,7 +44,7 @@ export default [
         ...globals.node,
         ...globals.jest,
         Atomics: "readonly",
-        SharedArrayBuffer: "readonly"
+        SharedArrayBuffer: "readonly",
       },
 
       parser: tsParser,
@@ -53,17 +53,17 @@ export default [
 
       parserOptions: {
         project: ["tsconfig.eslint.json"],
-        tsconfigRootDir: "."
-      }
+        tsconfigRootDir: ".",
+      },
     },
 
     settings: {
       "import/resolver": {
         typescript: {
           alwaysTryTypes: true,
-          project: "tsconfig.eslint.json"
-        }
-      }
+          project: "tsconfig.eslint.json",
+        },
+      },
     },
 
     rules: {
@@ -75,7 +75,7 @@ export default [
       "no-console": "off",
       "no-shadow": "off",
       "no-unused-vars": "off",
-      "prettier/prettier": "error"
-    }
-  }
+      "prettier/prettier": "error",
+    },
+  },
 ]
