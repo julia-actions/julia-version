@@ -27,9 +27,12 @@ type NightlyPlatform = {
 /**
  * Determine a specific Julia version for each version specifier.
  *
- * @param versionSpecifiers: A list of version specifiers. See the README for details on the syntax.
- * @param project: The Julia project directory or file to use when determining Julia compatibility with a project.
- * @param options: The `ifMissing` option controls the behavior of this function when a version specifier cannot be resolved.
+ * @param versionSpecifiers: A list of version specifiers. See the README for
+ * details on the syntax.
+ * @param project: The Julia project directory or file to use when determining
+ * Julia compatibility with a project.
+ * @param options: The `ifMissing` option controls the behavior of this
+ * function when a version specifier cannot be resolved.
  * @returns A list of resolved versions
  * @throws Error if a version specifier doesn't resolve to any available
  * Julia release

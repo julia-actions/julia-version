@@ -49084,20 +49084,24 @@ const NIGHTLY_BASE_URL = "https://julialangnightlies-s3.julialang.org/bin";
 const DEFAULT_NIGHTLY_PLATFORM = {
     platform: "linux",
     arch: "x86_64",
-    ext: "tar.gz"
+    ext: "tar.gz",
 };
 /**
  * Determine a specific Julia version for each version specifier.
  *
- * @param versionSpecifiers: A list of version specifiers. See the README for details on the syntax.
- * @param project: The Julia project directory or file to use when determining Julia compatibility with a project.
- * @param options: The `ifMissing` option controls the behavior of this function when a version specifier cannot be resolved.
+ * @param versionSpecifiers: A list of version specifiers. See the README for
+ * details on the syntax.
+ * @param project: The Julia project directory or file to use when determining
+ * Julia compatibility with a project.
+ * @param options: The `ifMissing` option controls the behavior of this
+ * function when a version specifier cannot be resolved.
  * @returns A list of resolved versions
  * @throws Error if a version specifier doesn't resolve to any available
  * Julia release
  */
 async function resolveVersions(versionSpecifiers, project = ".", options) {
-    // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
+    // Determine the Julia compat ranges as specified by the Project.toml only
+    // for aliases that require them.
     let juliaCompatRange = "";
     if (versionSpecifiers.includes("min")) {
         const juliaProjectFile = getJuliaProjectFile(project);
@@ -49152,7 +49156,7 @@ async function fetchJuliaVersionsJson() {
         retries: 5,
         onRetry: (err) => {
             coreExports.info(`Download of versions.json failed, trying again. Error: ${err}`);
-        }
+        },
     });
     if (!versionsFile) {
         throw new Error(`Unable to download versions.json after 5 attempts`);
@@ -49245,7 +49249,7 @@ function uniqueArray(array) {
 async function run() {
     try {
         const versionSpecifiers = parseVersionSpecifiers(coreExports.getInput("versions", {
-            required: true
+            required: true,
         }));
         const juliaProject = coreExports.getInput("project", { required: false }) ||
             process.env.JULIA_PROJECT ||

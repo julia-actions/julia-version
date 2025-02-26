@@ -6,13 +6,14 @@ on:
     branches:
       - main
 
+# These permissions are needed to:
+# - Checkout the Git repository (`contents: read`)
+permissions:
+  contents: read
+
 jobs:
   version:
     name: Resolve Julia Versions
-    # These permissions are needed to:
-    # - Checkout the Git repository (`contents: read`)
-    permissions:
-      contents: read
     runs-on: ubuntu-latest
     outputs:
       json: ${{ steps.julia-version.outputs.unique }}
