@@ -1,7 +1,7 @@
 {
   "name": "julia-version",
   "description": "Resolve version specifiers into Julia versions",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Curtis Vogt",
   "type": "module",
   "private": false,
