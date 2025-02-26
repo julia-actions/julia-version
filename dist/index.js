@@ -49088,7 +49088,10 @@ const DEFAULT_NIGHTLY_PLATFORM = {
 function versionSort(versions) {
     return versions.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
-async function resolveVersionSpecifiers(versionSpecifiers, project, options) {
+function uniqueArray(array) {
+    return array.filter((value, index, arr) => arr.indexOf(value) === index);
+}
+async function resolveVersions(versionSpecifiers, project = ".", options) {
     // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
     let juliaCompatRange = "";
     if (versionSpecifiers.includes("min")) {
@@ -49100,7 +49103,6 @@ async function resolveVersionSpecifiers(versionSpecifiers, project, options) {
         coreExports.debug(`Julia project compatibility range: ${juliaCompatRange}`);
     }
     const availableVersions = Object.keys(await fetchJuliaVersionsJson());
-    // const resolvedVersions = new Set<string>([])
     const resolvedVersions = new Array();
     for (const versionSpecifier of versionSpecifiers) {
         let resolvedVersion;
@@ -49115,13 +49117,11 @@ async function resolveVersionSpecifiers(versionSpecifiers, project, options) {
             resolvedVersion = versionSpecifier;
         }
         else {
-            resolvedVersion = resolveVersionSpecifier(versionSpecifier, availableVersions, juliaCompatRange);
+            resolvedVersion = resolveVersion(versionSpecifier, availableVersions, juliaCompatRange);
         }
         coreExports.debug(`${versionSpecifier} -> ${resolvedVersion}`);
         if (resolvedVersion) {
-            if (!resolvedVersions.includes(resolvedVersion)) {
-                resolvedVersions.push(resolvedVersion);
-            }
+            resolvedVersions.push(resolvedVersion);
         }
         else if (options?.ifMissing === "warn") {
             coreExports.warning(`No Julia version exists matching specifier: "${versionSpecifier}"`);
@@ -49130,7 +49130,7 @@ async function resolveVersionSpecifiers(versionSpecifiers, project, options) {
             throw new Error(`No Julia version exists matching specifier: "${versionSpecifier}"`);
         }
     }
-    return versionSort(resolvedVersions);
+    return resolvedVersions;
 }
 /**
  * Fetch and parse the Julia versions.json file.
@@ -49170,7 +49170,7 @@ async function fetchJuliaVersionsJson() {
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-function resolveVersionSpecifier(versionRange, availableVersions, juliaCompatRange = null) {
+function resolveVersion(versionRange, availableVersions, juliaCompatRange = null) {
     if (semverExports.valid(versionRange) == versionRange &&
         availableVersions.includes(versionRange)) {
         // versionRange is already a valid semver version (not a semver range)
@@ -49206,9 +49206,9 @@ async function urlExists(url) {
         return true;
     }
     else if (response.status != 404) {
-        console.error(`HTTP HEAD request to ${url} failed with response: ${response.status} ${response.statusText}`);
+        coreExports.error(`HTTP HEAD request to ${url} failed with response: ${response.status} ${response.statusText}`);
         const errorBody = await response.text();
-        console.error(`${errorBody}`);
+        coreExports.error(`${errorBody}`);
     }
     return false;
 }
@@ -49229,11 +49229,12 @@ async function run() {
         const ifMissing = coreExports.getInput("if-missing", { required: false });
         // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
         coreExports.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`);
-        const resolvedVersions = await resolveVersionSpecifiers(versionSpecifiers, juliaProject, { ifMissing });
-        coreExports.setOutput("resolved", JSON.stringify(resolvedVersions));
+        const resolvedVersions = await resolveVersions(versionSpecifiers, juliaProject, { ifMissing });
+        const uniqueVersions = versionSort(uniqueArray(resolvedVersions.filter((value) => value !== null)));
+        coreExports.setOutput("unique", JSON.stringify(uniqueVersions));
         // Display output in CI logs to assist with debugging.
         if (process.env.CI) {
-            coreExports.info(`resolved=${JSON.stringify(resolvedVersions)}`);
+            coreExports.info(`unique=${JSON.stringify(uniqueVersions)}`);
         }
         // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
     }

@@ -12,7 +12,9 @@ jest.unstable_mockModule("@actions/core", () => core)
 
 // The module being tested should be imported dynamically. This ensures that the
 // mocks are used in place of any actual dependencies.
-const { resolveVersions, resolveVersion, versionSort } = await import("../src/version.js")
+const { resolveVersions, resolveVersion, versionSort } = await import(
+  "../src/version.js"
+)
 
 describe("versionSort tests", () => {
   it("Returns the proper order", () => {
@@ -50,14 +52,24 @@ describe("resolveVersions tests", () => {
   })
 
   it("Handles nightly", async () => {
-    expect(await resolveVersions(["nightly"], ".")).toEqual(["nightly"])
-    expect(await resolveVersions(["1.10-nightly"], ".")).toEqual(["1.10-nightly"])
-    expect(await resolveVersions(["1.11-nightly"], ".")).toEqual(["1.11-nightly"])
-    expect(await resolveVersions(["1.12-nightly"], ".")).toEqual(["1.12-nightly"])
+    await expect(resolveVersions(["nightly"], ".")).resolves.toEqual([
+      "nightly"
+    ])
+    await expect(resolveVersions(["1.10-nightly"], ".")).resolves.toEqual([
+      "1.10-nightly"
+    ])
+    await expect(resolveVersions(["1.11-nightly"], ".")).resolves.toEqual([
+      "1.11-nightly"
+    ])
+    await expect(resolveVersions(["1.12-nightly"], ".")).resolves.toEqual([
+      "1.12-nightly"
+    ])
   })
 
   it("Respects ifMissing error", async () => {
-    expect(async () => await resolveVersions(["1.9-nightly"], ".", { ifMissing: "error" })).rejects.toThrow("No Julia version exists")
+    await expect(
+      resolveVersions(["1.9-nightly"], ".", { ifMissing: "error" })
+    ).rejects.toThrow("No Julia version exists")
   })
 
   it("Respects ifMissing warning", async () => {
@@ -69,7 +81,9 @@ describe("resolveVersions tests", () => {
   })
 
   it("Default ifMissing behavior", async () => {
-    expect(async () => await resolveVersions(["1.9-nightly"], ".")).rejects.toThrow("No Julia version exists")
+    await expect(resolveVersions(["1.9-nightly"], ".")).rejects.toThrow(
+      "No Julia version exists"
+    )
   })
 })
 
@@ -81,12 +95,8 @@ describe("resolveVersion tests", () => {
   describe("specific versions", () => {
     it("Must return an available version", () => {
       expect(resolveVersion("1.0.5", [])).toBeNull()
-      expect(resolveVersion("1.0.5", ["1.0.5", "1.0.6"])).toEqual(
-        "1.0.5"
-      )
-      expect(resolveVersion("1.0.5", ["1.0.4", "1.0.5"])).toEqual(
-        "1.0.5"
-      )
+      expect(resolveVersion("1.0.5", ["1.0.5", "1.0.6"])).toEqual("1.0.5")
+      expect(resolveVersion("1.0.5", ["1.0.4", "1.0.5"])).toEqual("1.0.5")
       expect(resolveVersion("1.0.5", ["1.0.4"])).toBeNull()
       expect(resolveVersion("1.3.0-alpha", [])).toBeNull()
       expect(
@@ -100,18 +110,10 @@ describe("resolveVersion tests", () => {
     })
 
     it("Respects v-prefix", () => {
-      expect(resolveVersion("1.0.5", ["v1.0.5", "v1.0.6"])).toEqual(
-        "v1.0.5"
-      )
-      expect(resolveVersion("1.0.5", ["v1.0.4", "v1.0.5"])).toEqual(
-        "v1.0.5"
-      )
-      expect(resolveVersion("v1.0.5", ["1.0.5", "1.0.6"])).toEqual(
-        "1.0.5"
-      )
-      expect(resolveVersion("v1.0.5", ["1.0.4", "1.0.5"])).toEqual(
-        "1.0.5"
-      )
+      expect(resolveVersion("1.0.5", ["v1.0.5", "v1.0.6"])).toEqual("v1.0.5")
+      expect(resolveVersion("1.0.5", ["v1.0.4", "v1.0.5"])).toEqual("v1.0.5")
+      expect(resolveVersion("v1.0.5", ["1.0.5", "1.0.6"])).toEqual("1.0.5")
+      expect(resolveVersion("v1.0.5", ["1.0.4", "1.0.5"])).toEqual("1.0.5")
     })
 
     it("version alias: nightly", () => {
@@ -127,15 +129,9 @@ describe("resolveVersion tests", () => {
     it("Chooses the highest available version that matches the input", () => {
       expect(resolveVersion("1", testVersions)).toEqual(latestRelease)
       expect(resolveVersion("1.0", testVersions)).toEqual("1.0.5")
-      expect(resolveVersion("^1.3.0-rc1", testVersions)).toEqual(
-        latestRelease
-      )
-      expect(resolveVersion("^1.2.0-rc1", testVersions)).toEqual(
-        latestRelease
-      )
-      expect(resolveVersion("^1.10.0-rc1", testVersions)).toEqual(
-        latestRelease
-      )
+      expect(resolveVersion("^1.3.0-rc1", testVersions)).toEqual(latestRelease)
+      expect(resolveVersion("^1.2.0-rc1", testVersions)).toEqual(latestRelease)
+      expect(resolveVersion("^1.10.0-rc1", testVersions)).toEqual(latestRelease)
     })
   })
 
@@ -172,12 +168,12 @@ describe("resolveVersion tests", () => {
       vers = ["1.6.7", "1.7.3-rc1", "1.7.3-rc2", "1.8.0"]
       expect(resolveVersion("min", vers, "^1.7")).toEqual("1.8.0")
 
-      expect(
-        resolveVersion("min", vers, "~1.7 || ~1.8 || ~1.9")
-      ).toEqual("1.8.0")
-      expect(
-        resolveVersion("min", vers, "~1.8 || ~1.7 || ~1.9")
-      ).toEqual("1.8.0")
+      expect(resolveVersion("min", vers, "~1.7 || ~1.8 || ~1.9")).toEqual(
+        "1.8.0"
+      )
+      expect(resolveVersion("min", vers, "~1.8 || ~1.7 || ~1.9")).toEqual(
+        "1.8.0"
+      )
       expect(resolveVersion("min", vers, "1.7 - 1.9")).toEqual("1.8.0")
 
       expect(resolveVersion("min", vers, "< 1.9.0")).toEqual("1.6.7")

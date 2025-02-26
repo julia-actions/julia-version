@@ -1,3 +1,5 @@
+export declare const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json";
+export declare const NIGHTLY_BASE_URL = "https://julialangnightlies-s3.julialang.org/bin";
 type Download = {
     url: string;
     triplet?: string;
@@ -23,9 +25,10 @@ type NightlyPlatform = {
     ext: string;
 };
 export declare function versionSort(versions: Array<string>): Array<string>;
-export declare function resolveVersionSpecifiers(versionSpecifiers: Array<string>, project: string, options?: {
+export declare function uniqueArray<T>(array: Array<T>): Array<T>;
+export declare function resolveVersions(versionSpecifiers: Array<string>, project?: string, options?: {
     ifMissing: string;
-}): Promise<Array<string>>;
+}): Promise<Array<string | null>>;
 /**
  * Fetch and parse the Julia versions.json file.
  *
@@ -48,7 +51,7 @@ export declare function fetchJuliaVersionsJson(): Promise<JuliaVersionsJson>;
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-export declare function resolveVersionSpecifier(versionRange: string, availableVersions: string[], juliaCompatRange?: string | null): string | null;
+export declare function resolveVersion(versionRange: string, availableVersions: string[], juliaCompatRange?: string | null): string | null;
 export declare function getNightlyUrl(nightly: NightlyPlatform, majorMinorVersion?: string | null): string;
 /**
  * Generates a list of nightly downloads. Verifies the generated URLs exist

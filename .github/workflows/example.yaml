@@ -15,7 +15,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.julia-version.outputs.resolved }}
+      json: ${{ steps.julia-version.outputs.unique }}
     steps:
       - uses: actions/checkout@v4
       - name: Create Project.toml

@@ -1,6 +1,6 @@
 import * as core from "@actions/core"
 import { parseVersionSpecifiers } from "./input.js"
-import { resolveVersions } from "./version.js"
+import { resolveVersions, uniqueArray, versionSort } from "./version.js"
 
 /**
  * The main function for the action.
@@ -29,11 +29,15 @@ export async function run(): Promise<void> {
       { ifMissing }
     )
 
-    core.setOutput("resolved", JSON.stringify(resolvedVersions))
+    const uniqueVersions = versionSort(
+      uniqueArray(resolvedVersions.filter<string>((value) => value !== null))
+    )
+
+    core.setOutput("unique", JSON.stringify(uniqueVersions))
 
     // Display output in CI logs to assist with debugging.
     if (process.env.CI) {
-      core.info(`resolved=${JSON.stringify(resolvedVersions)}`)
+      core.info(`unique=${JSON.stringify(uniqueVersions)}`)
     }
 
     // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))

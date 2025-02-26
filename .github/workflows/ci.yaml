@@ -63,9 +63,9 @@ jobs:
         shell: bash
         run: |
           set -x
-          [[ "$(jq -r 'length' <<<"$resolved")" -eq 3 ]] || exit 1
-          [[ "$(jq -r '.[0]' <<<"$resolved")" == "1.6.0" ]] || exit 1
-          [[ "$(jq -r '.[1]' <<<"$resolved")" =~ ^1\.10\.([8-9]|[1-9][0-9]*)$ ]] || exit 1   # [1.10.8, 1.11.0)
-          [[ "$(jq -r '.[2]' <<<"$resolved")" =~ ^1\.(1[1-9]|2[0-9]+)\.[0-9]+$ ]] || exit 1  # [1.11.0, ∞)
+          [[ "$(jq -r 'length' <<<"$unique")" -eq 3 ]] || exit 1
+          [[ "$(jq -r '.[0]' <<<"$unique")" == "1.6.0" ]] || exit 1
+          [[ "$(jq -r '.[1]' <<<"$unique")" =~ ^1\.10\.([8-9]|[1-9][0-9]*)$ ]] || exit 1   # [1.10.8, 1.11.0)
+          [[ "$(jq -r '.[2]' <<<"$unique")" =~ ^1\.(1[1-9]|2[0-9]+)\.[0-9]+$ ]] || exit 1  # [1.11.0, ∞)
         env:
-          resolved: ${{ steps.julia-version.outputs.resolved }}
+          unique: ${{ steps.julia-version.outputs.unique }}

@@ -25,10 +25,10 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.julia-version.outputs.resolved }}
+      json: ${{ steps.julia-version.outputs.unique }}
     steps:
       - uses: actions/checkout@v4 # Needed for "min" to access the Project.toml
-      - uses: julia-actions/julia-version@cv/implementation
+      - uses: julia-actions/julia-version@v1
         id: julia-version
         with:
           versions: |
@@ -75,7 +75,7 @@ jobs:
 
 | Name               | Description | Example |
 |:-------------------|:------------|:--------|
-| `resolved`         | The unique JSON list of resolved Julia versions. | <pre><code class="language-json">["1.0.0", "1.10.8", "1.11.3"]</code></pre> |
+| `unique`           | The unique JSON list of resolved Julia versions. | <pre><code class="language-json">["1.0.0", "1.10.8", "1.11.3"]</code></pre> |
 
 <!-- markdownlint-enable MD033 -->
 <!-- prettier-ignore-end -->

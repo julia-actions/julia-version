@@ -7,12 +7,14 @@ import * as toml from "toml"
 
 import { getJuliaProjectFile, getJuliaCompatRange } from "./project.js"
 
-export const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json"
+export const VERSIONS_JSON_URL =
+  "https://julialang-s3.julialang.org/bin/versions.json"
 
 // TODO: Add marker to versions.json to indicate LTS?
 const LTS_VERSION = "1.10"
 
-export const NIGHTLY_BASE_URL = "https://julialangnightlies-s3.julialang.org/bin"
+export const NIGHTLY_BASE_URL =
+  "https://julialangnightlies-s3.julialang.org/bin"
 const NIGHTLY_PLATFORMS = [
   { platform: "winnt", arch: "x64", suffix: "win64", ext: "tar.gz" },
   // {platform: "winnt", arch: "x64", suffix: "win64", ext: "zip"},
@@ -69,11 +71,15 @@ export function versionSort(versions: Array<string>): Array<string> {
   )
 }
 
+export function uniqueArray<T>(array: Array<T>): Array<T> {
+  return array.filter((value, index, arr) => arr.indexOf(value) === index)
+}
+
 export async function resolveVersions(
   versionSpecifiers: Array<string>,
   project: string = ".",
   options?: { ifMissing: string }
-): Promise<Array<string>> {
+): Promise<Array<string | null>> {
   // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
   let juliaCompatRange: string = ""
   if (versionSpecifiers.includes("min")) {
@@ -90,8 +96,7 @@ export async function resolveVersions(
 
   const availableVersions = Object.keys(await fetchJuliaVersionsJson())
 
-  // const resolvedVersions = new Set<string>([])
-  const resolvedVersions = new Array<string>()
+  const resolvedVersions = new Array<string | null>()
   for (const versionSpecifier of versionSpecifiers) {
     let resolvedVersion: string | null
 
@@ -114,9 +119,7 @@ export async function resolveVersions(
     core.debug(`${versionSpecifier} -> ${resolvedVersion}`)
 
     if (resolvedVersion) {
-      if (!resolvedVersions.includes(resolvedVersion)) {
-        resolvedVersions.push(resolvedVersion)
-      }
+      resolvedVersions.push(resolvedVersion)
     } else if (options?.ifMissing === "warn") {
       core.warning(
         `No Julia version exists matching specifier: "${versionSpecifier}"`
@@ -128,7 +131,7 @@ export async function resolveVersions(
     }
   }
 
-  return versionSort(resolvedVersions)
+  return resolvedVersions
 }
 
 /**
@@ -277,11 +280,11 @@ export async function genNightlies(
         extension: nightly.ext
       })
     } else if (response.status != 404) {
-      console.error(
+      core.error(
         `HTTP HEAD request to ${url} failed with response: ${response.status} ${response.statusText}`
       )
       const errorBody = await response.text()
-      console.error(`${errorBody}`)
+      core.error(`${errorBody}`)
     }
   }
 
