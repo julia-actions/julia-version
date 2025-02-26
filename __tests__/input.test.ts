@@ -55,7 +55,7 @@ describe("parseVersionSpecifiers", () => {
     expect(parseVersionSpecifiers('- "1"\n- "2"\n- "3"')).toEqual([
       "1",
       "2",
-      "3"
+      "3",
     ])
   })
 

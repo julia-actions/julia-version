@@ -10,9 +10,9 @@ const config = {
     esModule: true,
     dir: "dist",
     format: "es",
-    sourcemap: true
+    sourcemap: true,
   },
-  plugins: [typescript(), nodeResolve({ preferBuiltins: true }), commonjs()]
+  plugins: [typescript(), nodeResolve({ preferBuiltins: true }), commonjs()],
 }
 
 export default config

@@ -29,12 +29,12 @@ const NIGHTLY_PLATFORMS = [
   { platform: "linux", arch: "x86_64", ext: "tar.gz" },
   { platform: "linux", arch: "aarch64", ext: "tar.gz" },
   { platform: "linux", arch: "i686", ext: "tar.gz" },
-  { platform: "freebsd", arch: "x86_64", ext: "tar.gz" }
+  { platform: "freebsd", arch: "x86_64", ext: "tar.gz" },
 ]
 const DEFAULT_NIGHTLY_PLATFORM = {
   platform: "linux",
   arch: "x86_64",
-  ext: "tar.gz"
+  ext: "tar.gz",
 }
 
 type Download = {
@@ -156,7 +156,7 @@ export async function fetchJuliaVersionsJson(): Promise<JuliaVersionsJson> {
         core.info(
           `Download of versions.json failed, trying again. Error: ${err}`
         )
-      }
+      },
     }
   )
 
@@ -280,7 +280,7 @@ export async function genNightlies(
         size,
         version: majorMinorVersion ? majorMinorVersion : "nightly",
         os: nightly.platform,
-        extension: nightly.ext
+        extension: nightly.ext,
       })
     } else if (response.status != 404) {
       core.error(

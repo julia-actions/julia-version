@@ -53,16 +53,16 @@ describe("resolveVersions tests", () => {
 
   it("Handles nightly", async () => {
     await expect(resolveVersions(["nightly"], ".")).resolves.toEqual([
-      "nightly"
+      "nightly",
     ])
     await expect(resolveVersions(["1.10-nightly"], ".")).resolves.toEqual([
-      "1.10-nightly"
+      "1.10-nightly",
     ])
     await expect(resolveVersions(["1.11-nightly"], ".")).resolves.toEqual([
-      "1.11-nightly"
+      "1.11-nightly",
     ])
     await expect(resolveVersions(["1.12-nightly"], ".")).resolves.toEqual([
-      "1.12-nightly"
+      "1.12-nightly",
     ])
   })
 
@@ -104,7 +104,7 @@ describe("resolveVersion tests", () => {
           "1.2.0",
           "1.3.0-alpha",
           "1.3.0-rc1",
-          "1.3.0"
+          "1.3.0",
         ])
       ).toEqual("1.3.0-alpha")
     })

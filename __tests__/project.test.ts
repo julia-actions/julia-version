@@ -10,7 +10,7 @@ import { tmpdir } from "node:os"
 import {
   getJuliaCompatRange,
   getJuliaProjectFile,
-  validJuliaCompatRange
+  validJuliaCompatRange,
 } from "../src/project.js"
 
 describe("getJuliaProjectFile tests", () => {

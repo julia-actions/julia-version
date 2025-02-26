@@ -11,7 +11,7 @@ export async function run(): Promise<void> {
   try {
     const versionSpecifiers = parseVersionSpecifiers(
       core.getInput("versions", {
-        required: true
+        required: true,
       })
     )
     const juliaProject =
