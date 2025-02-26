@@ -1,6 +1,6 @@
 import * as core from "@actions/core"
 import { parseVersionSpecifiers } from "./input.js"
-import { resolveVersionSpecifiers } from "./version.js"
+import { resolveVersions } from "./version.js"
 
 /**
  * The main function for the action.
@@ -23,7 +23,7 @@ export async function run(): Promise<void> {
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
     core.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`)
 
-    const resolvedVersions = await resolveVersionSpecifiers(
+    const resolvedVersions = await resolveVersions(
       versionSpecifiers,
       juliaProject,
       { ifMissing }

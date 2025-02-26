@@ -69,7 +69,7 @@ export function versionSort(versions: Array<string>): Array<string> {
   )
 }
 
-export async function resolveVersionSpecifiers(
+export async function resolveVersions(
   versionSpecifiers: Array<string>,
   project: string = ".",
   options?: { ifMissing: string }
@@ -104,7 +104,7 @@ export async function resolveVersionSpecifiers(
       // Skip URL check for "nightly" as it should always be available
       resolvedVersion = versionSpecifier
     } else {
-      resolvedVersion = resolveVersionSpecifier(
+      resolvedVersion = resolveVersion(
         versionSpecifier,
         availableVersions,
         juliaCompatRange
@@ -177,7 +177,7 @@ export async function fetchJuliaVersionsJson(): Promise<JuliaVersionsJson> {
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-export function resolveVersionSpecifier(
+export function resolveVersion(
   versionRange: string,
   availableVersions: string[],
   juliaCompatRange: string | null = null
