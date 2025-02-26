@@ -1,10 +1,20 @@
 /**
  * Unit tests for src/version.ts
  */
-import { testVersions } from "../__fixtures__/constants.js"
-import { resolveVersionSpecifier, versionSort } from "../src/version.js"
+import { jest } from "@jest/globals"
+import nock from "nock"
 
-describe("versionSort", () => {
+import * as core from "../__fixtures__/core.js"
+import { testVersions, versionsJsonFile } from "../__fixtures__/constants.js"
+
+// Mocks should be declared before the module being tested is imported.
+jest.unstable_mockModule("@actions/core", () => core)
+
+// The module being tested should be imported dynamically. This ensures that the
+// mocks are used in place of any actual dependencies.
+const { resolveVersionSpecifier, resolveVersionSpecifiers, versionSort } = await import("../src/version.js")
+
+describe("versionSort tests", () => {
   it("Returns the proper order", () => {
     const arr = ["5.5.1", "4.21.0", "4.22.0", "6.1.0", "5.1.0", "4.5.0"]
     const expected = ["4.5.0", "4.21.0", "4.22.0", "5.1.0", "5.5.1", "6.1.0"]
@@ -12,6 +22,54 @@ describe("versionSort", () => {
     expect(arr).not.toEqual(expected)
     expect(arr.sort()).not.toEqual(expected)
     expect(versionSort(arr)).toEqual(expected)
+  })
+})
+
+describe("resolveVersionSpecifiers tests", () => {
+  beforeEach(() => {
+    // Instead of downloading versions.json, use `__fixtures__/versions.json`.
+    // Mocking `node-fetch` with `jest` directly or `jest-fetch-mock` doesn't work well with ESM:
+    // https://github.com/node-fetch/node-fetch/issues/1263
+    nock("https://julialang-s3.julialang.org")
+      .persist()
+      .get("/bin/versions.json")
+      .replyWithFile(200, versionsJsonFile)
+
+    // Replicate the available nightlies when versions.json was downloaded.
+    nock("https://julialangnightlies-s3.julialang.org")
+      .persist()
+      .head(/1\.(10|11|12)/)
+      .reply(200)
+      .head(/.*/)
+      .reply(404)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+    nock.cleanAll()
+  })
+
+  it("Handles nightly", async () => {
+    expect(await resolveVersionSpecifiers(["nightly"], ".")).toEqual(["nightly"])
+    expect(await resolveVersionSpecifiers(["1.10-nightly"], ".")).toEqual(["1.10-nightly"])
+    expect(await resolveVersionSpecifiers(["1.11-nightly"], ".")).toEqual(["1.11-nightly"])
+    expect(await resolveVersionSpecifiers(["1.12-nightly"], ".")).toEqual(["1.12-nightly"])
+  })
+
+  it("Respects ifMissing error", async () => {
+    expect(async () => await resolveVersionSpecifiers(["1.9-nightly"], ".", { ifMissing: "error" })).rejects.toThrow("No Julia version exists")
+  })
+
+  it("Respects ifMissing warning", async () => {
+    await resolveVersionSpecifiers(["1.9-nightly"], ".", { ifMissing: "warn" })
+    expect(core.warning).toHaveBeenNthCalledWith(
+      1,
+      expect.stringMatching(/^No Julia version exists/)
+    )
+  })
+
+  it("Default ifMissing behavior", async () => {
+    expect(async () => await resolveVersionSpecifiers(["1.9-nightly"], ".")).rejects.toThrow("No Julia version exists")
   })
 })
 

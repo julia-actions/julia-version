@@ -7,10 +7,33 @@ import * as toml from "toml"
 
 import { getJuliaProjectFile, getJuliaCompatRange } from "./project.js"
 
-const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json"
+export const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json"
 
 // TODO: Add marker to versions.json to indicate LTS?
 const LTS_VERSION = "1.10"
+
+export const NIGHTLY_BASE_URL = "https://julialangnightlies-s3.julialang.org/bin"
+const NIGHTLY_PLATFORMS = [
+  { platform: "winnt", arch: "x64", suffix: "win64", ext: "tar.gz" },
+  // {platform: "winnt", arch: "x64", suffix: "win64", ext: "zip"},
+  { platform: "winnt", arch: "x64", suffix: "win64", ext: "exe" },
+  { platform: "winnt", arch: "x86", suffix: "win32", ext: "tar.gz" },
+  // {platform: "winnt", arch: "x86", suffix: "win32", ext: "zip"},
+  { platform: "winnt", arch: "x86", suffix: "win32", ext: "exe" },
+  { platform: "macos", arch: "aarch64", ext: "tar.gz" },
+  { platform: "macos", arch: "aarch64", ext: "dmg" },
+  { platform: "macos", arch: "x86_64", ext: "tar.gz" },
+  { platform: "macos", arch: "x86_64", ext: "dmg" },
+  { platform: "linux", arch: "x86_64", ext: "tar.gz" },
+  { platform: "linux", arch: "aarch64", ext: "tar.gz" },
+  { platform: "linux", arch: "i686", ext: "tar.gz" },
+  { platform: "freebsd", arch: "x86_64", ext: "tar.gz" }
+]
+const DEFAULT_NIGHTLY_PLATFORM = {
+  platform: "linux",
+  arch: "x86_64",
+  ext: "tar.gz"
+}
 
 type Download = {
   url: string
@@ -39,29 +62,6 @@ type NightlyPlatform = {
   ext: string
 }
 
-const NIGHTLY_BASE_URL = "https://julialangnightlies-s3.julialang.org/bin"
-const NIGHTLY_PLATFORMS = [
-  { platform: "winnt", arch: "x64", suffix: "win64", ext: "tar.gz" },
-  // {platform: "winnt", arch: "x64", suffix: "win64", ext: "zip"},
-  { platform: "winnt", arch: "x64", suffix: "win64", ext: "exe" },
-  { platform: "winnt", arch: "x86", suffix: "win32", ext: "tar.gz" },
-  // {platform: "winnt", arch: "x86", suffix: "win32", ext: "zip"},
-  { platform: "winnt", arch: "x86", suffix: "win32", ext: "exe" },
-  { platform: "macos", arch: "aarch64", ext: "tar.gz" },
-  { platform: "macos", arch: "aarch64", ext: "dmg" },
-  { platform: "macos", arch: "x86_64", ext: "tar.gz" },
-  { platform: "macos", arch: "x86_64", ext: "dmg" },
-  { platform: "linux", arch: "x86_64", ext: "tar.gz" },
-  { platform: "linux", arch: "aarch64", ext: "tar.gz" },
-  { platform: "linux", arch: "i686", ext: "tar.gz" },
-  { platform: "freebsd", arch: "x86_64", ext: "tar.gz" }
-]
-const DEFAULT_NIGHTLY_PLATFORM = {
-  platform: "linux",
-  arch: "x86_64",
-  ext: "tar.gz"
-}
-
 // Based upon: https://stackoverflow.com/a/40201629
 export function versionSort(versions: Array<string>): Array<string> {
   return versions.sort((a, b) =>
@@ -71,7 +71,7 @@ export function versionSort(versions: Array<string>): Array<string> {
 
 export async function resolveVersionSpecifiers(
   versionSpecifiers: Array<string>,
-  project: string,
+  project: string = ".",
   options?: { ifMissing: string }
 ): Promise<Array<string>> {
   // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
@@ -222,11 +222,11 @@ async function urlExists(url: string): Promise<boolean> {
   if (response.ok) {
     return true
   } else if (response.status != 404) {
-    console.error(
+    core.error(
       `HTTP HEAD request to ${url} failed with response: ${response.status} ${response.statusText}`
     )
     const errorBody = await response.text()
-    console.error(`${errorBody}`)
+    core.error(`${errorBody}`)
   }
 
   return false
