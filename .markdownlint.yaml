@@ -1,4 +1,5 @@
 # See: https://github.com/DavidAnson/markdownlint
+# For details on rules see: https://github.com/updownpress/markdown-lint/tree/master/rules
 ---
 # Unordered list style
 MD004:
@@ -10,7 +11,7 @@ MD013:
 
 # Ordered list item prefix
 MD029:
-  style: one
+  style: ordered
 
 # Spaces after list markers
 MD030:
