@@ -64,23 +64,26 @@ type NightlyPlatform = {
   ext: string
 }
 
-// Based upon: https://stackoverflow.com/a/40201629
-export function versionSort(versions: Array<string>): Array<string> {
-  return versions.sort((a, b) =>
-    a.localeCompare(b, undefined, { numeric: true })
-  )
-}
-
-export function uniqueArray<T>(array: Array<T>): Array<T> {
-  return array.filter((value, index, arr) => arr.indexOf(value) === index)
-}
-
+/**
+ * Determine a specific Julia version for each version specifier.
+ *
+ * @param versionSpecifiers: A list of version specifiers. See the README for
+ * details on the syntax.
+ * @param project: The Julia project directory or file to use when determining
+ * Julia compatibility with a project.
+ * @param options: The `ifMissing` option controls the behavior of this
+ * function when a version specifier cannot be resolved.
+ * @returns A list of resolved versions
+ * @throws Error if a version specifier doesn't resolve to any available
+ * Julia release
+ */
 export async function resolveVersions(
   versionSpecifiers: Array<string>,
   project: string = ".",
   options?: { ifMissing: string }
 ): Promise<Array<string | null>> {
-  // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
+  // Determine the Julia compat ranges as specified by the Project.toml only
+  // for aliases that require them.
   let juliaCompatRange: string = ""
   if (versionSpecifiers.includes("min")) {
     const juliaProjectFile = getJuliaProjectFile(project)
@@ -289,4 +292,27 @@ export async function genNightlies(
   }
 
   return downloads
+}
+
+/**
+ * Sort a list of SemVer compatible version strings.
+ *
+ * @param versions: A list of version strings.
+ * @returns The sorted list of versions.
+ */
+export function versionSort(versions: Array<string>): Array<string> {
+  // Based upon: https://stackoverflow.com/a/40201629
+  return versions.sort((a, b) =>
+    a.localeCompare(b, undefined, { numeric: true })
+  )
+}
+
+/**
+ * Create a unique list
+ *
+ * @param array: An array
+ * @returns An array with unique elements in no particular order
+ */
+export function uniqueArray<T>(array: Array<T>): Array<T> {
+  return array.filter((value, index, arr) => arr.indexOf(value) === index)
 }

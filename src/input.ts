@@ -1,5 +1,6 @@
 import YAML from "yaml"
 
+// Changes here should be reflected in the Backus-Naur grammar in the README
 const _NR = /(?:0|[1-9])[0-9]*/
 const _NIGHTLY = new RegExp(`(?:${_NR.source}\\.${_NR.source}-)?nightly`)
 const _NUMERIC_VERSION = new RegExp(
@@ -14,7 +15,8 @@ export function parseVersionSpecifiers(raw: string): Array<string> {
   let specifiers: Array<string>
 
   // Use schema failsafe to avoid YAML parsing of numbers. For example YAML
-  // will return `1.10` as `1.1`.
+  // will return `1.10` as `1.1`. Users still need to pass in strings in the
+  // workflow YAML.
   const yaml = YAML.parse(raw, { schema: "failsafe" })
   if (Array.isArray(yaml) && yaml.every((el) => typeof el === "string")) {
     specifiers = yaml

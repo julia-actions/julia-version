@@ -24,8 +24,16 @@ type NightlyPlatform = {
     suffix?: string;
     ext: string;
 };
-export declare function versionSort(versions: Array<string>): Array<string>;
-export declare function uniqueArray<T>(array: Array<T>): Array<T>;
+/**
+ * Determine a specific Julia version for each version specifier.
+ *
+ * @param versionSpecifiers: A list of version specifiers. See the README for details on the syntax.
+ * @param project: The Julia project directory or file to use when determining Julia compatibility with a project.
+ * @param options: The `ifMissing` option controls the behavior of this function when a version specifier cannot be resolved.
+ * @returns A list of resolved versions
+ * @throws Error if a version specifier doesn't resolve to any available
+ * Julia release
+ */
 export declare function resolveVersions(versionSpecifiers: Array<string>, project?: string, options?: {
     ifMissing: string;
 }): Promise<Array<string | null>>;
@@ -61,4 +69,18 @@ export declare function getNightlyUrl(nightly: NightlyPlatform, majorMinorVersio
  * @returns A list of downloads which exist.
  */
 export declare function genNightlies(majorMinorVersion?: string | null): Promise<Array<Download>>;
+/**
+ * Sort a list of SemVer compatible version strings.
+ *
+ * @param versions: A list of version strings.
+ * @returns The sorted list of versions.
+ */
+export declare function versionSort(versions: Array<string>): Array<string>;
+/**
+ * Create a unique list
+ *
+ * @param array: An array
+ * @returns An array with unique elements in no particular order
+ */
+export declare function uniqueArray<T>(array: Array<T>): Array<T>;
 export {};

@@ -34679,6 +34679,7 @@ var YAML = /*#__PURE__*/Object.freeze({
 	visitAsync: visitAsync
 });
 
+// Changes here should be reflected in the Backus-Naur grammar in the README
 const _NR = /(?:0|[1-9])[0-9]*/;
 const _NIGHTLY = new RegExp(`(?:${_NR.source}\\.${_NR.source}-)?nightly`);
 const _NUMERIC_VERSION = new RegExp(`[\\^~]?${_NR.source}(?:\\.${_NR.source}(?:\\.${_NR.source})?)?`);
@@ -34687,7 +34688,8 @@ const VERSION_SPECIFIER_REGEX = new RegExp(`^(?:${_NUMERIC_VERSION.source}|${_NI
 function parseVersionSpecifiers(raw) {
     let specifiers;
     // Use schema failsafe to avoid YAML parsing of numbers. For example YAML
-    // will return `1.10` as `1.1`.
+    // will return `1.10` as `1.1`. Users still need to pass in strings in the
+    // workflow YAML.
     const yaml = YAML.parse(raw, { schema: "failsafe" });
     if (Array.isArray(yaml) && yaml.every((el) => typeof el === "string")) {
         specifiers = yaml;
@@ -49084,13 +49086,16 @@ const DEFAULT_NIGHTLY_PLATFORM = {
     arch: "x86_64",
     ext: "tar.gz"
 };
-// Based upon: https://stackoverflow.com/a/40201629
-function versionSort(versions) {
-    return versions.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-}
-function uniqueArray(array) {
-    return array.filter((value, index, arr) => arr.indexOf(value) === index);
-}
+/**
+ * Determine a specific Julia version for each version specifier.
+ *
+ * @param versionSpecifiers: A list of version specifiers. See the README for details on the syntax.
+ * @param project: The Julia project directory or file to use when determining Julia compatibility with a project.
+ * @param options: The `ifMissing` option controls the behavior of this function when a version specifier cannot be resolved.
+ * @returns A list of resolved versions
+ * @throws Error if a version specifier doesn't resolve to any available
+ * Julia release
+ */
 async function resolveVersions(versionSpecifiers, project = ".", options) {
     // Determine the Julia compat ranges as specified by the Project.toml only for aliases that require them.
     let juliaCompatRange = "";
@@ -49211,6 +49216,25 @@ async function urlExists(url) {
         coreExports.error(`${errorBody}`);
     }
     return false;
+}
+/**
+ * Sort a list of SemVer compatible version strings.
+ *
+ * @param versions: A list of version strings.
+ * @returns The sorted list of versions.
+ */
+function versionSort(versions) {
+    // Based upon: https://stackoverflow.com/a/40201629
+    return versions.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+}
+/**
+ * Create a unique list
+ *
+ * @param array: An array
+ * @returns An array with unique elements in no particular order
+ */
+function uniqueArray(array) {
+    return array.filter((value, index, arr) => arr.indexOf(value) === index);
 }
 
 /**
