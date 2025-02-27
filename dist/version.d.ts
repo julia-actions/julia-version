@@ -58,12 +58,13 @@ export declare function fetchJuliaVersionsJson(): Promise<JuliaVersionsJson>;
  * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
- * @param juliaCompatRange: The Node semver range to further restrict the results
+ * @param juliaCompatRange: The Node semver range to further restrict the results.
+ * @param manifestJuliaVersion: The Julia version specified in the Julia manifest.
  * @returns The full semver version number
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-export declare function resolveVersion(versionRange: string, availableVersions: string[], juliaCompatRange?: string | null): string | null;
+export declare function resolveVersion(versionRange: string, availableVersions: string[], juliaCompatRange?: string | null, manifestJuliaVersion?: string | null): string | null;
 export declare function getNightlyUrl(nightly: NightlyPlatform, majorMinorVersion?: string | null): string;
 /**
  * Generates a list of nightly downloads. Verifies the generated URLs exist

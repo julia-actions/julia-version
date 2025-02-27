@@ -6,7 +6,11 @@ import * as semver from "semver"
 import * as toml from "toml"
 
 import { IfMissing } from "./input.js"
-import { getJuliaProjectFile, getJuliaCompatRange } from "./project.js"
+import {
+  getJuliaProjectFile,
+  getJuliaManifestFile,
+  getJuliaCompatRange,
+} from "./project.js"
 
 export const VERSIONS_JSON_URL =
   "https://julialang-s3.julialang.org/bin/versions.json"
@@ -98,6 +102,17 @@ export async function resolveVersions(
     core.debug(`Julia project compatibility range: ${juliaCompatRange}`)
   }
 
+  let manifestJuliaVersion: string | null = null
+  if (versionSpecifiers.includes("manifest")) {
+    const juliaManifestFile = getJuliaManifestFile(project)
+    const juliaManifestToml = toml.parse(
+      fs.readFileSync(juliaManifestFile).toString()
+    )
+
+    manifestJuliaVersion = juliaManifestToml.julia_version
+    core.debug(`Julia manifest version: ${manifestJuliaVersion}`)
+  }
+
   const availableVersions = Object.keys(await fetchJuliaVersionsJson())
 
   const resolvedVersions = new Array<string | null>()
@@ -116,7 +131,8 @@ export async function resolveVersions(
       resolvedVersion = resolveVersion(
         versionSpecifier,
         availableVersions,
-        juliaCompatRange
+        juliaCompatRange,
+        manifestJuliaVersion
       )
     }
 
@@ -179,7 +195,8 @@ export async function fetchJuliaVersionsJson(): Promise<JuliaVersionsJson> {
  * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
- * @param juliaCompatRange: The Node semver range to further restrict the results
+ * @param juliaCompatRange: The Node semver range to further restrict the results.
+ * @param manifestJuliaVersion: The Julia version specified in the Julia manifest.
  * @returns The full semver version number
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
@@ -187,7 +204,8 @@ export async function fetchJuliaVersionsJson(): Promise<JuliaVersionsJson> {
 export function resolveVersion(
   versionRange: string,
   availableVersions: string[],
-  juliaCompatRange: string | null = null
+  juliaCompatRange: string | null = null,
+  manifestJuliaVersion: string | null = null
 ): string | null {
   if (
     semver.valid(versionRange) == versionRange &&
@@ -206,6 +224,8 @@ export function resolveVersion(
     return semver.minSatisfying(availableVersions, juliaCompatRange)
   } else if (versionRange === "lts") {
     return semver.maxSatisfying(availableVersions, LTS_VERSION)
+  } else if (versionRange === "manifest") {
+    return manifestJuliaVersion
   } else {
     // Use the highest available version that match the version range
     return semver.maxSatisfying(availableVersions, versionRange)

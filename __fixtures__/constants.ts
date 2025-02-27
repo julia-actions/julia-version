@@ -10,6 +10,20 @@ export const versionsJsonFile = path.join(
   "versions.json"
 )
 
+export const projectDirV1 = path.join(
+  __dirname,
+  "..",
+  "__fixtures__",
+  "julia-manifest-v1"
+)
+
+export const projectDirV2 = path.join(
+  __dirname,
+  "..",
+  "__fixtures__",
+  "julia-manifest-v2"
+)
+
 export const testVersions = Object.keys(
   JSON.parse(fs.readFileSync(versionsJsonFile).toString())
 )

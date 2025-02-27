@@ -167,6 +167,12 @@ Resolves to the lowest Julia version compatible with the Julia project. Using
 this alias requires that the `project` input refers to a directory containing a
 `Project.toml` (or `JuliaProject.toml`) and a `julia` compat entry exist.
 
+### `manifest` Alias
+
+Resolves to the Julia version as specified in the Julia manifest file. Using
+this alias requires that the `project` input refers to a directory containing a
+`Manifest.toml` (or `JuliaManifest.toml`).
+
 ### Grammar
 
 Here is the complete Backus-Naur grammar for a version specifier:
@@ -177,7 +183,7 @@ Here is the complete Backus-Naur grammar for a version specifier:
 <caret>     ::= "^" <partial>
 <partial>   ::= <n> | <n> "." <n> | <n> "." <n> "." <n>
 <nightly>   ::= <n> "." <n> "-nightly" | "nightly"
-<alias>     ::= "lts" | "min"
+<alias>     ::= "lts" | "min" | "manifest"
 <n>         ::= "0" | <positive> <digits>
 <digits>    ::= <digit> | <digit> <digits>
 <digit>     ::= "0" | <positive>

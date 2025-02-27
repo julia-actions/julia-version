@@ -4,12 +4,21 @@ export type JuliaProjectTOML = {
     };
 };
 /**
- * Determine the path to a Julia project file from a directory or filename.
+ * Determine the path to a Julia project file from the project.
  *
+ * @param juliaProject: The Julia project/environment.
  * @returns The path to the Julia project file.
  * @throws Error if the Julia project file doesn't exist.
  */
 export declare function getJuliaProjectFile(juliaProject: string): string;
+/**
+ * Determine the path to a Julia manifest file from the project.
+ *
+ * @param juliaProject: The Julia project/environment.
+ * @returns The path to the Julia manifest file.
+ * @throws Error if the Julia manifest file doesn't exist.
+ */
+export declare function getJuliaManifestFile(juliaProject: string): string;
 /**
  * Determine the NPM semver range string from a parsed Julia project TOML.
  *

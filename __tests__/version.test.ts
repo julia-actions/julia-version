@@ -6,7 +6,12 @@ import nock from "nock"
 import semver from "semver"
 
 import * as core from "../__fixtures__/core.js"
-import { testVersions, versionsJsonFile } from "../__fixtures__/constants.js"
+import {
+  testVersions,
+  versionsJsonFile,
+  projectDirV1,
+  projectDirV2,
+} from "../__fixtures__/constants.js"
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule("@actions/core", () => core)
@@ -67,6 +72,18 @@ describe("resolveVersions tests", () => {
     ])
   })
 
+  it("Handles alias: manifest", async () => {
+    await expect(resolveVersions(["manifest"], projectDirV2)).resolves.toEqual([
+      "1.11.3",
+    ])
+    await expect(resolveVersions(["manifest"], projectDirV1)).rejects.toThrow(
+      "No Julia version exists matching specifier"
+    )
+    await expect(resolveVersions(["manifest"], ".")).rejects.toThrow(
+      "Unable to locate Julia manifest file"
+    )
+  })
+
   it("Respects ifMissing error", async () => {
     await expect(
       resolveVersions(["1.9-nightly"], ".", { ifMissing: "error" })
@@ -123,6 +140,18 @@ describe("resolveVersion tests", () => {
 
     it("version alias: lts", () => {
       expect(resolveVersion("lts", testVersions)).toEqual(latestLts)
+    })
+
+    it("version alias: manifest", () => {
+      expect(resolveVersion("manifest", testVersions)).toBeNull()
+      expect(resolveVersion("manifest", testVersions, null, "1.11.3")).toEqual(
+        "1.11.3"
+      )
+
+      // An unofficial build of say `1.12.0-DEV.850` is recorded as `1.12.0-DEV` in the manifest
+      expect(
+        resolveVersion("manifest", testVersions, null, "1.12.0-DEV")
+      ).toEqual("1.12.0-DEV")
     })
   })
 

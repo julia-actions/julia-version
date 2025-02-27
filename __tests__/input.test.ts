@@ -42,6 +42,7 @@ describe("parseVersionSpecifiers", () => {
   it("Handle alias scalar", () => {
     expect(parseVersionSpecifiers("lts")).toEqual(["lts"])
     expect(parseVersionSpecifiers("min")).toEqual(["min"])
+    expect(parseVersionSpecifiers("manifest")).toEqual(["manifest"])
 
     expect(() => parseVersionSpecifiers("pre")).toThrow(
       "Invalid version specifier"
