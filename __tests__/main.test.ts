@@ -52,13 +52,13 @@ describe("run", () => {
     nock.cleanAll()
   })
 
-  it("Sets the unique output", async () => {
+  it("Sets the output", async () => {
     await run()
 
     // Verify the time output was set.
     expect(core.setOutput).toHaveBeenNthCalledWith(
       1,
-      "unique",
+      "unique-json",
       // Regex to confirm that version output is a JSON list of version strings
       expect.stringMatching(/^\["1\.\d+\.\d+"\]$/)
     )

@@ -9,11 +9,10 @@ branding:
 inputs:
   versions:
     description: >-
-      The Julia version specifier or list of specifiers to resolve. Inputs
-      formats supported include scalars, JSON lists, and YAML lists. When
-      passing in a scalar prefer using a string instead of a numeric value to
-      avoid unwanted YAML decimal conversions (e.g. `1.10` will be interpreted
-      as `1.1`).
+      The Julia version specifier or list of specifiers to resolve. Support
+      formats include a scalar, JSON list, or a YAML list. When passing in a
+      scalar prefer using a string instead of a numeric value to avoid unwanted
+      YAML decimal conversions (e.g. `1.10` will be interpreted as `1.1`).
     required: true
   project:
     description: >-
@@ -28,7 +27,7 @@ inputs:
     required: false
     default: warn
 outputs:
-  unique:
+  unique-json:
     description: The unique JSON list of resolved Julia versions.
 runs:
   using: node20

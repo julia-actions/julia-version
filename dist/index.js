@@ -49259,17 +49259,19 @@ async function run() {
         coreExports.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`);
         const resolvedVersions = await resolveVersions(versionSpecifiers, juliaProject, { ifMissing });
         const uniqueVersions = versionSort(uniqueArray(resolvedVersions.filter((value) => value !== null)));
-        coreExports.setOutput("unique", JSON.stringify(uniqueVersions));
-        // Display output in CI logs to assist with debugging.
-        if (process.env.CI) {
-            coreExports.info(`unique=${JSON.stringify(uniqueVersions)}`);
-        }
-        // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
+        setOutput("unique-json", JSON.stringify(uniqueVersions));
     }
     catch (error) {
         // Fail the workflow run if an error occurs
         if (error instanceof Error)
             coreExports.setFailed(error.message);
+    }
+}
+function setOutput(key, value) {
+    coreExports.setOutput(key, value);
+    // Display output in CI logs to assist with debugging.
+    if (process.env.CI) {
+        coreExports.info(`${key}=${value}`);
     }
 }
 

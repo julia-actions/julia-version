@@ -33,16 +33,18 @@ export async function run(): Promise<void> {
       uniqueArray(resolvedVersions.filter<string>((value) => value !== null))
     )
 
-    core.setOutput("unique", JSON.stringify(uniqueVersions))
-
-    // Display output in CI logs to assist with debugging.
-    if (process.env.CI) {
-      core.info(`unique=${JSON.stringify(uniqueVersions)}`)
-    }
-
-    // core.setOutput("downloads-json", JSON.stringify(downloads, null, 4))
+    setOutput("unique-json", JSON.stringify(uniqueVersions))
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)
+  }
+}
+
+function setOutput(key: string, value: string): void {
+  core.setOutput(key, value)
+
+  // Display output in CI logs to assist with debugging.
+  if (process.env.CI) {
+    core.info(`${key}=${value}`)
   }
 }
