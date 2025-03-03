@@ -49260,6 +49260,9 @@ async function run() {
         const resolvedVersions = await resolveVersions(versionSpecifiers, juliaProject, { ifMissing });
         const uniqueVersions = versionSort(uniqueArray(resolvedVersions.filter((value) => value !== null)));
         setOutput("unique-json", JSON.stringify(uniqueVersions));
+        if (versionSpecifiers.length == 1) {
+            setOutput("version", uniqueVersions[0] || "");
+        }
     }
     catch (error) {
         // Fail the workflow run if an error occurs

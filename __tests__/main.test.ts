@@ -62,6 +62,12 @@ describe("run", () => {
       // Regex to confirm that version output is a JSON list of version strings
       expect.stringMatching(/^\["1\.\d+\.\d+"\]$/)
     )
+
+    expect(core.setOutput).toHaveBeenNthCalledWith(
+      2,
+      "version",
+      expect.stringMatching(/^1\.\d+\.\d+$/)
+    )
   })
 
   it("Sets a failed status", async () => {

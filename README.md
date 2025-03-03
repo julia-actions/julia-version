@@ -76,6 +76,7 @@ jobs:
 | Name               | Description | Example |
 |:-------------------|:------------|:--------|
 | `unique-json`      | The unique JSON list of resolved Julia versions. | <pre><code class="language-json">["1.0.0", "1.10.8", "1.11.3"]</code></pre> |
+| `version`          | The single resolved Julia version when the input is a single version specifier. Will be an empty string if version cannot be resolved. | `1.11.3` |
 
 <!-- markdownlint-enable MD033 -->
 <!-- prettier-ignore-end -->

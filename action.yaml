@@ -29,6 +29,10 @@ inputs:
 outputs:
   unique-json:
     description: The unique JSON list of resolved Julia versions.
+  version:
+    description: >-
+      The single resolved Julia version when the input is a single version
+      specifier. Will be an empty string if version cannot be resolved.
 runs:
   using: node20
   main: dist/index.js
