@@ -61,7 +61,8 @@ describe("parseVersionSpecifiers", () => {
 
   it("Avoid YAML number parsing", async () => {
     expect(parseVersionSpecifiers("1.10")).toEqual(["1.10"])
-    expect(parseVersionSpecifiers("01.1")).toEqual(["01.1"])
+    expect(parseVersionSpecifiers("1.0")).toEqual(["1.0"])
+    expect(parseVersionSpecifiers("0.1")).toEqual(["0.1"])
   })
 
   it("Do not support arbitrary YAML", async () => {

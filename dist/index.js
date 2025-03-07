@@ -34680,11 +34680,11 @@ var YAML = /*#__PURE__*/Object.freeze({
 });
 
 // Changes here should be reflected in the Backus-Naur grammar in the README
-const _NR = /(?:0|[1-9])[0-9]*/;
-const _NIGHTLY = new RegExp(`(?:${_NR.source}\\.${_NR.source}-)?nightly`);
-const _NUMERIC_VERSION = new RegExp(`[\\^~]?${_NR.source}(?:\\.${_NR.source}(?:\\.${_NR.source})?)?`);
-const _ALIAS = /lts|min/;
-const VERSION_SPECIFIER_REGEX = new RegExp(`^(?:${_NUMERIC_VERSION.source}|${_NIGHTLY.source}|${_ALIAS.source})$`);
+const _N = /(?:0|[1-9][0-9]*)/;
+const _NIGHTLY = new RegExp(`(?:${_N.source}\\.${_N.source}-)?nightly`);
+const _VERSION_RANGE = new RegExp(`[\\^~]?${_N.source}(?:\\.${_N.source}(?:\\.${_N.source})?)?`);
+const _ALIAS = /(?:lts|min)/;
+const VERSION_SPECIFIER_REGEX = new RegExp(`^(?:${_VERSION_RANGE.source}|${_NIGHTLY.source}|${_ALIAS.source})$`);
 function parseVersionSpecifiers(raw) {
     let specifiers;
     // Use schema failsafe to avoid YAML parsing of numbers. For example YAML
