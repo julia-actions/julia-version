@@ -172,13 +172,16 @@ this alias requires that the `project` input refers to a directory containing a
 Here is the complete Backus-Naur grammar for a version specifier:
 
 ```bnf
-specifier ::= tilde | caret | partial | nightly | alias
-tilde     ::= '~' partial
-caret     ::= '^' partial
-partial   ::= nr ( '.' nr ( '.' nr ) ? ) ?
-nightly   ::= ( nr '.' nr '-' ) ? 'nightly'
-alias     ::= 'lts' | 'min'
-nr        ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
+<specifier> ::= <tilde> | <caret> | <partial> | <nightly> | <alias>
+<tilde>     ::= "~" <partial>
+<caret>     ::= "^" <partial>
+<partial>   ::= <n> | <n> "." <n> | <n> "." <n> "." <n>
+<nightly>   ::= <n> "." <n> "-nightly" | "nightly"
+<alias>     ::= "lts" | "min"
+<n>         ::= "0" | <positive> <digits>
+<digits>    ::= <digit> | <digit> <digits>
+<digit>     ::= "0" | <positive>
+<positive>  ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 ```
 
 Note we are purposefully not supporting the SemVer prerelease syntax at this
