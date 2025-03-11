@@ -5,22 +5,19 @@
 After you've cloned the repository to your local machine or codespace, you'll
 need to perform some initial setup steps before you can develop your action.
 
-> [!NOTE]
->
-> You'll need to have a reasonably modern version of
-> [Node.js](https://nodejs.org) installed. If you are using a version manager
-> like [`nodenv`](https://github.com/nodenv/nodenv) or
-> [`fnm`](https://github.com/Schniz/fnm), this package has a `.node-version`
-> file at the root of the repository that can be used to automatically switch to
-> the correct version when you `cd` into this repository.
+1. Install a [Node.js](https://nodejs.org). If you are using a version manager
+   like [`nodenv`](https://github.com/nodenv/nodenv) or
+   [`fnm`](https://github.com/Schniz/fnm), thispackage has a `.node-version`
+   file at the root of the repository that can be used to automatically switch
+   to the correct version when you `cd` into this repository.
 
-1. Install the dependencies
+2. Install the dependencies
 
    ```bash
    npm install
    ```
 
-2. Verify the tests pass
+3. Verify the tests pass
 
    ```bash
    $ npm test
