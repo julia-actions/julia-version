@@ -72,3 +72,26 @@ jobs:
         env:
           unique_json: ${{ steps.julia-version.outputs.unique-json }}
           version: ${{ steps.julia-version.outputs.version }}
+
+  test-yaml-dec:
+    name: YAML Decimal Test
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test julia-version
+        id: julia-version
+        uses: ./
+        with:
+          versions: 1.10  # !!! IMPORTANT: Do not do this. You should always pass in a string
+          if-missing: error
+
+      - name: Validate output
+        shell: bash
+        run: |
+          set -x
+          # User expects "1.10.*"
+          [[ "$version" == "1.1.1" ]] || exit 1
+        env:
+          version: ${{ steps.julia-version.outputs.version }}
