@@ -12,6 +12,10 @@ describe("parseVersionSpecifiers", () => {
     expect(parseVersionSpecifiers("~1.2.3")).toEqual(["~1.2.3"])
     expect(parseVersionSpecifiers("^1.2.3")).toEqual(["^1.2.3"])
 
+    expect(() => parseVersionSpecifiers("1.2.3.4")).toThrow(
+      "Invalid version specifier"
+    )
+
     expect(() => parseVersionSpecifiers("1.2.3-prerelease")).toThrow(
       "Invalid version specifier"
     )
