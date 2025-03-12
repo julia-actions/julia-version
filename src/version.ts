@@ -223,7 +223,6 @@ export function getNightlyUrl(
 
 async function urlExists(url: string): Promise<boolean> {
   // Perform a HEAD request to validate the HTTP server contains the specified file exists.
-  // TODO: Verify the performance of these requests in CI.
   const response = await fetch(url, { method: "HEAD" })
   if (response.ok) {
     return true
@@ -264,7 +263,6 @@ export async function genNightlies(
     const url = getNightlyUrl(nightly, majorMinorVersion)
 
     // Perform a HEAD request to validate the specified nightly exists.
-    // TODO: Verify the performance of these requests in CI.
     const response = await fetch(url, { method: "HEAD" })
     if (response.status == 200) {
       const size = parseInt(response.headers.get("content-length") ?? "0")

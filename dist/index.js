@@ -49209,7 +49209,6 @@ function getNightlyUrl(nightly, majorMinorVersion = null) {
 }
 async function urlExists(url) {
     // Perform a HEAD request to validate the HTTP server contains the specified file exists.
-    // TODO: Verify the performance of these requests in CI.
     const response = await fetch(url, { method: "HEAD" });
     if (response.ok) {
         return true;
