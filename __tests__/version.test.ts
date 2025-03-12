@@ -3,6 +3,7 @@
  */
 import { jest } from "@jest/globals"
 import nock from "nock"
+import semver from "semver"
 
 import * as core from "../__fixtures__/core.js"
 import { testVersions, versionsJsonFile } from "../__fixtures__/constants.js"
@@ -133,31 +134,41 @@ describe("resolveVersion tests", () => {
       expect(resolveVersion("^1.2.0-rc1", testVersions)).toEqual(latestRelease)
       expect(resolveVersion("^1.10.0-rc1", testVersions)).toEqual(latestRelease)
     })
+
+    // https://github.com/julia-actions/julia-version/issues/5
+    it.skip.failing("prereleases", () => {
+      expect(resolveVersion("~1.1-", ["1.0.0", "1.1.0-rc1"])).toEqual(
+        "1.1.0-rc1"
+      )
+      expect(resolveVersion("^1.1-", ["1.0.0", "1.1.0-rc1"])).toEqual(
+        "1.1.0-rc1"
+      )
+      expect(resolveVersion("~1.1-", ["1.0.0", "1.1.0-rc1", "1.1.0"])).toEqual(
+        "1.1.0"
+      )
+      expect(resolveVersion("^1.1-", ["1.0.0", "1.1.0-rc1", "1.1.0"])).toEqual(
+        "1.1.0"
+      )
+      expect(
+        resolveVersion("~1.1-", ["1.0.0", "1.1.0-rc1", "1.1.0", "1.2.0-rc1"])
+      ).toEqual("1.1.0")
+      expect(
+        resolveVersion("^1.1-", ["1.0.0", "1.1.0-rc1", "1.1.0", "1.2.0-rc1"])
+      ).toEqual("1.2.0-rc1")
+    })
   })
 
-  // describe("include-prereleases", () => {
-  //   it("Chooses the highest available version that matches the input including prereleases", () => {
-  //     expect(resolveVersion("^1.2.0-0", testVersions, true)).toEqual(
-  //       latestPre
-  //     )
-  //     expect(resolveVersion("1", testVersions, true)).toEqual(latestPre)
-  //     expect(resolveVersion("^1.2.0-0", testVersions, false)).toEqual(
-  //       latestPre
-  //     )
-  //   })
-  // })
-
-  // describe("node-semver behaviour", () => {
-  //   describe("Windows installer change", () => {
-  //     it("Correctly understands >1.4.0", () => {
-  //       const options = { includePrerelease: true }
-  //       expect(semver.gtr("1.4.0-rc1", "1.3", options)).toBeTruthy()
-  //       expect(semver.gtr("1.4.0-DEV", "1.3", options)).toBeTruthy()
-  //       expect(semver.gtr("1.3.1", "1.3", options)).toBeFalsy()
-  //       expect(semver.gtr("1.3.2-rc1", "1.3", options)).toBeFalsy()
-  //     })
-  //   })
-  // })
+  describe("node-semver behavior", () => {
+    describe("Windows installer change", () => {
+      it.skip.failing("Correctly understands >1.4.0", () => {
+        const options = { includePrerelease: true }
+        expect(semver.gtr("1.4.0-rc1", "1.3", options)).toBeTruthy()
+        expect(semver.gtr("1.4.0-DEV", "1.3", options)).toBeTruthy()
+        expect(semver.gtr("1.3.1", "1.3", options)).toBeFalsy()
+        expect(semver.gtr("1.3.2-rc1", "1.3", options)).toBeFalsy()
+      })
+    })
+  })
 
   describe("julia compat versions", () => {
     it("Understands min", () => {
@@ -167,14 +178,24 @@ describe("resolveVersion tests", () => {
 
       vers = ["1.6.7", "1.7.3-rc1", "1.7.3-rc2", "1.8.0"]
       expect(resolveVersion("min", vers, "^1.7")).toEqual("1.8.0")
+      // expect(resolveVersion("min", vers, "^1.7-")).toEqual("1.7.3-rc1")
 
       expect(resolveVersion("min", vers, "~1.7 || ~1.8 || ~1.9")).toEqual(
         "1.8.0"
       )
+      // expect(resolveVersion("min", vers, "~1.7- || ~1.8- || ~1.9-")).toEqual(
+      //   "1.7.3-rc1"
+      // )
+
       expect(resolveVersion("min", vers, "~1.8 || ~1.7 || ~1.9")).toEqual(
         "1.8.0"
       )
+      // expect(resolveVersion("min", vers, "~1.8- || ~1.7- || ~1.9-")).toEqual(
+      //   "1.7.3-rc1"
+      // )
+
       expect(resolveVersion("min", vers, "1.7 - 1.9")).toEqual("1.8.0")
+      // expect(resolveVersion("min", vers, "1.7- - 1.9-")).toEqual("1.7.3-rc1")
 
       expect(resolveVersion("min", vers, "< 1.9.0")).toEqual("1.6.7")
       expect(resolveVersion("min", vers, ">= 1.6.0")).toEqual("1.6.7")
@@ -187,53 +208,4 @@ describe("resolveVersion tests", () => {
       )
     })
   })
-
-  // describe("julia compat versions", () => {
-  //   it("Understands min", () => {
-  //     let vers = ["1.6.7", "1.7.1-rc1", "1.7.1-rc2", "1.7.1", "1.7.2", "1.8.0"]
-
-  //     expect(resolveVersion("min", vers, false, "^1.7")).toEqual("1.7.1")
-  //     expect(resolveVersion("min", vers, true, "^1.7")).toEqual(
-  //       "1.7.1-rc1"
-  //     )
-
-  //     vers = ["1.6.7", "1.7.3-rc1", "1.7.3-rc2", "1.8.0"]
-  //     expect(resolveVersion("min", vers, false, "^1.7")).toEqual("1.8.0")
-  //     expect(resolveVersion("min", vers, true, "^1.7")).toEqual(
-  //       "1.7.3-rc1"
-  //     )
-
-  //     expect(
-  //       resolveVersion("min", vers, false, "~1.7 || ~1.8 || ~1.9")
-  //     ).toEqual("1.8.0")
-  //     expect(
-  //       resolveVersion("min", vers, true, "~1.7 || ~1.8 || ~1.9")
-  //     ).toEqual("1.7.3-rc1")
-  //     expect(
-  //       resolveVersion("min", vers, false, "~1.8 || ~1.7 || ~1.9")
-  //     ).toEqual("1.8.0")
-  //     expect(
-  //       resolveVersion("min", vers, true, "~1.8 || ~1.7 || ~1.9")
-  //     ).toEqual("1.7.3-rc1")
-
-  //     expect(resolveVersion("min", vers, false, "1.7 - 1.9")).toEqual(
-  //       "1.8.0"
-  //     )
-  //     expect(resolveVersion("min", vers, true, "1.7 - 1.9")).toEqual(
-  //       "1.7.3-rc1"
-  //     )
-
-  //     expect(resolveVersion("min", vers, true, "< 1.9.0")).toEqual("1.6.7")
-  //     expect(resolveVersion("min", vers, true, ">= 1.6.0")).toEqual(
-  //       "1.6.7"
-  //     )
-
-  //     // NPM"s semver package treats "1.7" as "~1.7" instead of "^1.7" like Julia
-  //     expect(resolveVersion("min", vers, false, "1.7")).toBeNull()
-
-  //     expect(() => resolveVersion("min", vers, true, "")).toThrow(
-  //       "Julia project file does not specify a compat for Julia"
-  //     )
-  //   })
-  // })
 })
