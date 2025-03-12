@@ -1,6 +1,8 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+# See: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+---
+name: julia-version
+description: Resolve version specifiers into Julia versions
+author: Curtis Vogt
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
@@ -12,7 +14,7 @@ inputs:
   milliseconds:
     description: Your input description here
     required: true
-    default: '1000'
+    default: "1000"
 
 # Define your outputs here.
 outputs:

@@ -7,6 +7,7 @@
 # If this workflow is run from a feature branch, it will act as an additional CI
 # check and fail if the checked-in `dist/` directory does not match what is
 # expected from the build.
+---
 name: Check Transpiled JavaScript
 
 on:
@@ -22,7 +23,7 @@ permissions:
 
 jobs:
   check-dist:
-    name: Check dist/
+    name: Check dist
     runs-on: ubuntu-latest
 
     steps:
@@ -41,7 +42,7 @@ jobs:
         id: install
         run: npm ci
 
-      - name: Build dist/ Directory
+      - name: Build dist Directory
         id: build
         run: npm run bundle
 

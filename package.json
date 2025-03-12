@@ -1,17 +1,17 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
+  "name": "julia-version",
+  "description": "Resolve version specifiers into Julia versions",
   "version": "0.0.0",
-  "author": "",
+  "author": "Curtis Vogt",
   "type": "module",
-  "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "private": false,
+  "homepage": "https://github.com/julia-actions/julia-version",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/julia-actions/julia-version.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/julia-actions/julia-version/issues"
   },
   "keywords": [
     "actions"

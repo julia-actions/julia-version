@@ -1,9 +1,9 @@
 # Create a GitHub Action Using TypeScript
 
-[![GitHub Super-Linter](https://github.com/actions/typescript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/actions/typescript-action/actions/workflows/ci.yml/badge.svg)
-[![Check dist/](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/check-dist.yml)
-[![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
+[![GitHub Super-Linter](https://github.com/julia-action/julia-version/actions/workflows/linter.yaml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/julia-action/julia-version/actions/workflows/ci.yaml/badge.svg)
+[![Check dist](https://github.com/julia-action/julia-version/actions/workflows/check-dist.yaml/badge.svg)](https://github.com/julia-action/julia-version/actions/workflows/check-dist.yaml)
+[![CodeQL](https://github.com/julia-action/julia-version/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/julia-action/julia-version/actions/workflows/codeql-analysis.yaml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
 Use this template to bootstrap the creation of a TypeScript action. :rocket:
@@ -20,10 +20,10 @@ To create your own action, you can use this repository as a template! Just
 follow the below instructions:
 
 1. Click the **Use this template** button at the top of the repository
-1. Select **Create a new repository**
-1. Select an owner and name for your new repository
-1. Click **Create repository**
-1. Clone your new repository
+2. Select **Create a new repository**
+3. Select an owner and name for your new repository
+4. Click **Create repository**
+5. Clone your new repository
 
 > [!IMPORTANT]
 >
@@ -53,13 +53,13 @@ need to perform some initial setup steps before you can develop your action.
    npm install
    ```
 
-1. :building_construction: Package the TypeScript for distribution
+2. :building_construction: Package the TypeScript for distribution
 
    ```bash
    npm run bundle
    ```
 
-1. :white_check_mark: Run the tests
+3. :white_check_mark: Run the tests
 
    ```bash
    $ npm test
@@ -74,11 +74,11 @@ need to perform some initial setup steps before you can develop your action.
 
 ## Update the Action Metadata
 
-The [`action.yml`](action.yml) file defines metadata about your action, such as
-input(s) and output(s). For details about this file, see
+The [`action.yaml`](action.yaml) file defines metadata about your action, such
+as input(s) and output(s). For details about this file, see
 [Metadata syntax for GitHub Actions](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions).
 
-When you copy this repository, update `action.yml` with the name, description,
+When you copy this repository, update `action.yaml` with the name, description,
 inputs, and outputs for your action.
 
 ## Update the Action Code
@@ -93,7 +93,7 @@ There are a few things to keep in mind when writing your action code:
   In `main.ts`, you will see that the action is run in an `async` function.
 
   ```javascript
-  import * as core from '@actions/core'
+  import * as core from "@actions/core"
   //...
 
   async function run() {
@@ -116,9 +116,9 @@ So, what are you waiting for? Go ahead and start customizing your action!
    git checkout -b releases/v1
    ```
 
-1. Replace the contents of `src/` with your action code
-1. Add tests to `__tests__/` for your source code
-1. Format, test, and build the action
+2. Replace the contents of `src/` with your action code
+3. Add tests to `__tests__/` for your source code
+4. Format, test, and build the action
 
    ```bash
    npm run all
@@ -129,7 +129,7 @@ So, what are you waiting for? Go ahead and start customizing your action!
    > you do not run this step, your action will not work correctly when it is
    > used in a workflow.
 
-1. (Optional) Test your action locally
+5. (Optional) Test your action locally
 
    The [`@github/local-action`](https://github.com/github/local-action) utility
    can be used to test your action locally. It is a simple command-line tool
@@ -157,21 +157,21 @@ So, what are you waiting for? Go ahead and start customizing your action!
    file, [`.env.example`](./.env.example), and the
    [GitHub Actions Documentation](https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables).
 
-1. Commit your changes
+6. Commit your changes
 
    ```bash
    git add .
    git commit -m "My first action is ready!"
    ```
 
-1. Push them to your repository
+7. Push them to your repository
 
    ```bash
    git push -u origin releases/v1
    ```
 
-1. Create a pull request and get feedback on your action
-1. Merge the pull request into the `main` branch
+8. Create a pull request and get feedback on your action
+9. Merge the pull request into the `main` branch
 
 Your action is now published! :rocket:
 
@@ -182,8 +182,8 @@ in the GitHub Actions toolkit.
 ## Validate the Action
 
 You can now validate the action by referencing it in a workflow file. For
-example, [`ci.yml`](./.github/workflows/ci.yml) demonstrates how to reference an
-action in the same repository.
+example, [`ci.yaml`](./.github/workflows/ci.yaml) demonstrates how to reference
+an action in the same repository.
 
 ```yaml
 steps:
@@ -203,7 +203,7 @@ steps:
 ```
 
 For example workflow runs, check out the
-[Actions tab](https://github.com/actions/typescript-action/actions)! :rocket:
+[Actions tab](https://github.com/julia-action/julia-version/actions)! :rocket:
 
 ## Usage
 
@@ -224,7 +224,7 @@ steps:
 
   - name: Test Local Action
     id: test-action
-    uses: actions/typescript-action@v1 # Commit with the `v1` tag
+    uses: julia-action/julia-version@v1 # Commit with the `v1` tag
     with:
       milliseconds: 1000
 
@@ -246,16 +246,16 @@ following steps:
 1. **Retrieving the latest release tag:** The script starts by fetching the most
    recent SemVer release tag of the current branch, by looking at the local data
    available in your repository.
-1. **Prompting for a new release tag:** The user is then prompted to enter a new
+2. **Prompting for a new release tag:** The user is then prompted to enter a new
    release tag. To assist with this, the script displays the tag retrieved in
    the previous step, and validates the format of the inputted tag (vX.X.X). The
    user is also reminded to update the version field in package.json.
-1. **Tagging the new release:** The script then tags a new release and syncs the
+3. **Tagging the new release:** The script then tags a new release and syncs the
    separate major tag (e.g. v1, v2) with the new release tag (e.g. v1.0.0,
    v2.1.2). When the user is creating a new major release, the script
    auto-detects this and creates a `releases/v#` branch for the previous major
    version.
-1. **Pushing changes to remote:** Finally, the script pushes the necessary
+4. **Pushing changes to remote:** Finally, the script pushes the necessary
    commits, tags and branches to the remote repository. From here, you will need
    to create a new release in GitHub so users can easily reference the new tags
    in their workflows.
@@ -263,13 +263,13 @@ following steps:
 ## Dependency License Management
 
 This template includes a GitHub Actions workflow,
-[`licensed.yml`](./.github/workflows/licensed.yml), that uses
+[`licensed.yaml`](./.github/workflows/licensed.yaml), that uses
 [Licensed](https://github.com/licensee/licensed) to check for dependencies with
 missing or non-compliant licenses. This workflow is initially disabled. To
 enable the workflow, follow the below steps.
 
-1. Open [`licensed.yml`](./.github/workflows/licensed.yml)
-1. Uncomment the following lines:
+1. Open [`licensed.yaml`](./.github/workflows/licensed.yaml)
+2. Uncomment the following lines:
 
    ```yaml
    # pull_request:
@@ -280,7 +280,7 @@ enable the workflow, follow the below steps.
    #     - main
    ```
 
-1. Save and commit the changes
+3. Save and commit the changes
 
 Once complete, this workflow will run any time a pull request is created or
 changes pushed directly to `main`. If the workflow detects any dependencies with
