@@ -16,48 +16,82 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        id: setup-node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: npm
 
       - name: Install Dependencies
-        id: npm-ci
         run: npm ci
 
       - name: Check Format
-        id: npm-format-check
         run: npm run format:check
 
       - name: Lint
-        id: npm-lint
         run: npm run lint
 
       - name: Test
-        id: npm-ci-test
         run: npm run ci-test
 
   test-action:
     name: GitHub Actions Test
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Test Local Action
-        id: test-action
+      - name: Create Project.toml
+        shell: bash
+        run: |
+          echo -e '[compat]\njulia = "1.6"' >Project.toml
+
+      - name: Test julia-version
+        id: julia-version
         uses: ./
         with:
-          milliseconds: 2000
+          versions: |
+            - min
+            - lts
+            - 1
+            - ~1.10
+          if-missing: error
 
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+      - name: Validate output
+        shell: bash
+        run: |
+          set -x
+          [[ "$(jq -r 'length' <<<"$unique_json")" -eq 3 ]] || exit 1
+          [[ "$(jq -r '.[0]' <<<"$unique_json")" == "1.6.0" ]] || exit 1
+          [[ "$(jq -r '.[1]' <<<"$unique_json")" =~ ^1\.10\.([8-9]|[1-9][0-9]*)$ ]] || exit 1   # [1.10.8, 1.11.0)
+          [[ "$(jq -r '.[2]' <<<"$unique_json")" =~ ^1\.(1[1-9]|2[0-9]+)\.[0-9]+$ ]] || exit 1  # [1.11.0, ∞)
+
+          [[ "$version" == "" ]] || exit 1
+        env:
+          unique_json: ${{ steps.julia-version.outputs.unique-json }}
+          version: ${{ steps.julia-version.outputs.version }}
+
+  test-yaml-dec:
+    name: YAML Decimal Test
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test julia-version
+        id: julia-version
+        uses: ./
+        with:
+          versions: 1.10 # !!! IMPORTANT: Do not do this. You should always pass in a string
+          if-missing: error
+
+      - name: Validate output
+        shell: bash
+        run: |
+          set -x
+          # User expects "1.10.*"
+          [[ "$version" == "1.1.1" ]] || exit 1
+        env:
+          version: ${{ steps.julia-version.outputs.version }}

@@ -3,24 +3,36 @@
 name: julia-version
 description: Resolve version specifiers into Julia versions
 author: Curtis Vogt
-
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
-
-# Define your inputs here.
+  icon: filter
+  color: purple
 inputs:
-  milliseconds:
-    description: Your input description here
+  versions:
+    description: >-
+      The Julia version specifier or list of specifiers to resolve. Support
+      formats include a scalar, JSON list, or a YAML list. When passing in a
+      scalar prefer using a string instead of a numeric value to avoid unwanted
+      YAML decimal conversions (e.g. `1.10` will be interpreted as `1.1`).
     required: true
-    default: "1000"
-
-# Define your outputs here.
+  project:
+    description: >-
+      The path to the Julia project directory or file to use when resolving some
+      specifiers (e.g. `min`). Defaults to using the environmental variable
+      `JULIA_PROJECT` if set or otherwise `.`.
+    required: false
+    default: "" # Empty string is a special value which falls back to using JULIA_PROJECT if defined, otherwise "."
+  if-missing:
+    description: >-
+      Determine the behavior if a version specifier cannot be resolved.
+    required: false
+    default: warn
 outputs:
-  time:
-    description: Your output description here
-
+  unique-json:
+    description: The unique JSON list of resolved Julia versions.
+  version:
+    description: >-
+      The single resolved Julia version when the input is a single version
+      specifier. Will be an empty string if version cannot be resolved.
 runs:
   using: node20
   main: dist/index.js
