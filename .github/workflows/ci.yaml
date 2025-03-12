@@ -98,7 +98,7 @@ jobs:
         id: julia-version
         uses: ./
         with:
-          versions: 1.10  # !!! IMPORTANT: Do not do this. You should always pass in a string
+          versions: 1.10 # !!! IMPORTANT: Do not do this. You should always pass in a string
           if-missing: error
 
       - name: Validate output
