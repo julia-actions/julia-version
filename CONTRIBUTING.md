@@ -44,8 +44,17 @@ as input(s) and output(s). For details about this file, see
    git checkout -b js/my-feature
    ```
 
-2. Make your changes to the action code in `src`
-3. Add tests to `__tests__` for your changes
+2. Make your changes to the action code in `src`.
+
+   Any changes to the regular expressions in `src/input.ts` should be reflected
+   in the Backus-Naur grammar in the `README.md`.
+
+3. Add tests to `__tests__` for your changes. If you need mock function calls we
+   use `nock` for HTTP requests and `jest` for everything else.
+
+   If required you may update the `__fixtures__/versions.json` file via
+   `curl -fsSL https://julialang-s3.julialang.org/bin/versions.json >__fixtures__/versions.json`.
+   Some tests will need to be updated if there are changes to `versions.json`.
 
 4. (Optional) Run the tests
 
