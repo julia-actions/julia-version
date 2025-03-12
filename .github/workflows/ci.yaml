@@ -73,20 +73,6 @@ jobs:
           unique_json: ${{ steps.julia-version.outputs.unique-json }}
           version: ${{ steps.julia-version.outputs.version }}
 
-  test-nightly-performance:
-    name: Nightly Performance
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Test nightly
-        id: nightly
-        uses: ./
-        with:
-          versions: 1.12-nightly
-
   test-yaml-dec:
     name: YAML Decimal Test
     permissions:
