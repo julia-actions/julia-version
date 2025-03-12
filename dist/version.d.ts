@@ -1,3 +1,4 @@
+import { IfMissing } from "./input.js";
 export declare const VERSIONS_JSON_URL = "https://julialang-s3.julialang.org/bin/versions.json";
 export declare const NIGHTLY_BASE_URL = "https://julialangnightlies-s3.julialang.org/bin";
 type Download = {
@@ -38,7 +39,7 @@ type NightlyPlatform = {
  * Julia release
  */
 export declare function resolveVersions(versionSpecifiers: Array<string>, project?: string, options?: {
-    ifMissing: string;
+    ifMissing: IfMissing;
 }): Promise<Array<string | null>>;
 /**
  * Fetch and parse the Julia versions.json file.

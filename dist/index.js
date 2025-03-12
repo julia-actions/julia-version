@@ -34707,6 +34707,14 @@ function parseVersionSpecifiers(raw) {
     }
     return specifiers;
 }
+function parseIfMissing(raw) {
+    if (raw === "warn" || raw === "error") {
+        return raw;
+    }
+    else {
+        throw new Error(`Invalid if-missing value: ${raw}`);
+    }
+}
 
 /**
  * Returns a `Buffer` instance from the given data URI `uri`.
@@ -49253,9 +49261,13 @@ async function run() {
         const juliaProject = coreExports.getInput("project", { required: false }) ||
             process.env.JULIA_PROJECT ||
             ".";
-        const ifMissing = coreExports.getInput("if-missing", { required: false });
+        const ifMissing = parseIfMissing(coreExports.getInput("if-missing", {
+            required: false,
+        }));
         // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
         coreExports.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`);
+        coreExports.debug(`juliaProject=${juliaProject}`);
+        coreExports.debug(`ifMissing=${ifMissing}`);
         const resolvedVersions = await resolveVersions(versionSpecifiers, juliaProject, { ifMissing });
         const uniqueVersions = versionSort(uniqueArray(resolvedVersions.filter((value) => value !== null)));
         setOutput("unique-json", JSON.stringify(uniqueVersions));

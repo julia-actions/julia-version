@@ -5,6 +5,7 @@ import retry from "async-retry"
 import * as semver from "semver"
 import * as toml from "toml"
 
+import { IfMissing } from "./input.js"
 import { getJuliaProjectFile, getJuliaCompatRange } from "./project.js"
 
 export const VERSIONS_JSON_URL =
@@ -80,7 +81,7 @@ type NightlyPlatform = {
 export async function resolveVersions(
   versionSpecifiers: Array<string>,
   project: string = ".",
-  options?: { ifMissing: string }
+  options?: { ifMissing: IfMissing }
 ): Promise<Array<string | null>> {
   // Determine the Julia compat ranges as specified by the Project.toml only
   // for aliases that require them.

@@ -1,5 +1,5 @@
 import * as core from "@actions/core"
-import { parseVersionSpecifiers } from "./input.js"
+import { parseIfMissing, parseVersionSpecifiers } from "./input.js"
 import { resolveVersions, uniqueArray, versionSort } from "./version.js"
 
 /**
@@ -18,10 +18,16 @@ export async function run(): Promise<void> {
       core.getInput("project", { required: false }) ||
       process.env.JULIA_PROJECT ||
       "."
-    const ifMissing = core.getInput("if-missing", { required: false })
+    const ifMissing = parseIfMissing(
+      core.getInput("if-missing", {
+        required: false,
+      })
+    )
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
     core.debug(`versionSpecifiers=${JSON.stringify(versionSpecifiers)}`)
+    core.debug(`juliaProject=${juliaProject}`)
+    core.debug(`ifMissing=${ifMissing}`)
 
     const resolvedVersions = await resolveVersions(
       versionSpecifiers,

@@ -1,4 +1,4 @@
-import { parseVersionSpecifiers } from "../src/input.js"
+import { parseVersionSpecifiers, parseIfMissing } from "../src/input.js"
 
 describe("parseVersionSpecifiers", () => {
   it("Handle numeric scalars", () => {
@@ -81,5 +81,19 @@ describe("parseVersionSpecifiers", () => {
       - 1    # Latest release`
 
     expect(parseVersionSpecifiers(versions)).toEqual(["min", "lts", "1"])
+  })
+})
+
+describe("parseIfMissing", () => {
+  it("Handle warn", () => {
+    expect(parseIfMissing("warn")).toEqual("warn")
+  })
+
+  it("Handle error", () => {
+    expect(parseIfMissing("error")).toEqual("error")
+  })
+
+  it("Handle empty", () => {
+    expect(() => parseIfMissing("")).toThrow("Invalid if-missing")
   })
 })

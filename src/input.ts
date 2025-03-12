@@ -1,5 +1,7 @@
 import YAML from "yaml"
 
+export type IfMissing = "warn" | "error"
+
 // Changes here should be reflected in the Backus-Naur grammar in the README
 const _N = /(?:0|[1-9][0-9]*)/
 const _NIGHTLY = new RegExp(`(?:${_N.source}\\.${_N.source}-)?nightly`)
@@ -33,4 +35,12 @@ export function parseVersionSpecifiers(raw: string): Array<string> {
   }
 
   return specifiers
+}
+
+export function parseIfMissing(raw: string): IfMissing {
+  if (raw === "warn" || raw === "error") {
+    return raw
+  } else {
+    throw new Error(`Invalid if-missing value: ${raw}`)
+  }
 }
