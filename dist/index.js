@@ -34683,7 +34683,7 @@ var YAML = /*#__PURE__*/Object.freeze({
 const _N = /(?:0|[1-9][0-9]*)/;
 const _NIGHTLY = new RegExp(`(?:${_N.source}\\.${_N.source}-)?nightly`);
 const _VERSION_RANGE = new RegExp(`[\\^~]?${_N.source}(?:\\.${_N.source}(?:\\.${_N.source})?)?`);
-const _ALIAS = /(?:lts|min)/;
+const _ALIAS = /(?:lts|min|manifest)/;
 const VERSION_SPECIFIER_REGEX = new RegExp(`^(?:${_VERSION_RANGE.source}|${_NIGHTLY.source}|${_ALIAS.source})$`);
 function parseVersionSpecifiers(raw) {
     let specifiers;
@@ -49002,8 +49002,9 @@ function requireToml () {
 var tomlExports = requireToml();
 
 /**
- * Determine the path to a Julia project file from a directory or filename.
+ * Determine the path to a Julia project file from the project.
  *
+ * @param juliaProject: The Julia project/environment.
  * @returns The path to the Julia project file.
  * @throws Error if the Julia project file doesn't exist.
  */
@@ -49022,9 +49023,37 @@ function getJuliaProjectFile(juliaProject) {
         }
     }
     if (!juliaProjectFile) {
-        throw new Error(`Unable to locate project file with project input: ${juliaProject}`);
+        throw new Error(`Unable to locate Julia project file with project: ${juliaProject}`);
     }
     return juliaProjectFile;
+}
+/**
+ * Determine the path to a Julia manifest file from the project.
+ *
+ * @param juliaProject: The Julia project/environment.
+ * @returns The path to the Julia manifest file.
+ * @throws Error if the Julia manifest file doesn't exist.
+ */
+function getJuliaManifestFile(juliaProject) {
+    let juliaManifestFile = "";
+    let juliaProjectDir;
+    if (fs.existsSync(juliaProject) && fs.lstatSync(juliaProject).isFile()) {
+        juliaProjectDir = path.basename(juliaProject);
+    }
+    else {
+        juliaProjectDir = juliaProject;
+    }
+    for (const filename of ["JuliaManifest.toml", "Manifest.toml"]) {
+        const p = path.join(juliaProjectDir, filename);
+        if (fs.existsSync(p) && fs.lstatSync(p).isFile()) {
+            juliaManifestFile = p;
+            break;
+        }
+    }
+    if (!juliaManifestFile) {
+        throw new Error(`Unable to locate Julia manifest file with project: ${juliaProject}`);
+    }
+    return juliaManifestFile;
 }
 /**
  * Determine the NPM semver range string from a parsed Julia project TOML.
@@ -49119,6 +49148,13 @@ async function resolveVersions(versionSpecifiers, project = ".", options) {
         juliaCompatRange = getJuliaCompatRange(juliaProjectToml);
         coreExports.debug(`Julia project compatibility range: ${juliaCompatRange}`);
     }
+    let manifestJuliaVersion = null;
+    if (versionSpecifiers.includes("manifest")) {
+        const juliaManifestFile = getJuliaManifestFile(project);
+        const juliaManifestToml = tomlExports.parse(fs.readFileSync(juliaManifestFile).toString());
+        manifestJuliaVersion = juliaManifestToml.julia_version;
+        coreExports.debug(`Julia manifest version: ${manifestJuliaVersion}`);
+    }
     const availableVersions = Object.keys(await fetchJuliaVersionsJson());
     const resolvedVersions = new Array();
     for (const versionSpecifier of versionSpecifiers) {
@@ -49134,7 +49170,7 @@ async function resolveVersions(versionSpecifiers, project = ".", options) {
             resolvedVersion = versionSpecifier;
         }
         else {
-            resolvedVersion = resolveVersion(versionSpecifier, availableVersions, juliaCompatRange);
+            resolvedVersion = resolveVersion(versionSpecifier, availableVersions, juliaCompatRange, manifestJuliaVersion);
         }
         coreExports.debug(`${versionSpecifier} -> ${resolvedVersion}`);
         if (resolvedVersion) {
@@ -49182,12 +49218,13 @@ async function fetchJuliaVersionsJson() {
  * @param availableVersions: An array of available Julia versions.
  * @param includePrereleases: Allow prereleases to be used when determining
  * the version number.
- * @param juliaCompatRange: The Node semver range to further restrict the results
+ * @param juliaCompatRange: The Node semver range to further restrict the results.
+ * @param manifestJuliaVersion: The Julia version specified in the Julia manifest.
  * @returns The full semver version number
  * @throws Error if the version specifier doesn't overlap with any available
  * Julia releases.
  */
-function resolveVersion(versionRange, availableVersions, juliaCompatRange = null) {
+function resolveVersion(versionRange, availableVersions, juliaCompatRange = null, manifestJuliaVersion = null) {
     if (semverExports.valid(versionRange) == versionRange &&
         availableVersions.includes(versionRange)) {
         // versionRange is already a valid semver version (not a semver range)
@@ -49203,6 +49240,9 @@ function resolveVersion(versionRange, availableVersions, juliaCompatRange = null
     }
     else if (versionRange === "lts") {
         return semverExports.maxSatisfying(availableVersions, LTS_VERSION);
+    }
+    else if (versionRange === "manifest") {
+        return manifestJuliaVersion;
     }
     else {
         // Use the highest available version that match the version range

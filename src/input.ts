@@ -8,7 +8,7 @@ const _NIGHTLY = new RegExp(`(?:${_N.source}\\.${_N.source}-)?nightly`)
 const _VERSION_RANGE = new RegExp(
   `[\\^~]?${_N.source}(?:\\.${_N.source}(?:\\.${_N.source})?)?`
 )
-const _ALIAS = /(?:lts|min)/
+const _ALIAS = /(?:lts|min|manifest)/
 const VERSION_SPECIFIER_REGEX = new RegExp(
   `^(?:${_VERSION_RANGE.source}|${_NIGHTLY.source}|${_ALIAS.source})$`
 )
