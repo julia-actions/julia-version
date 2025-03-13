@@ -74,7 +74,7 @@ describe("resolveVersions tests", () => {
 
   it("Handles alias: manifest", async () => {
     await expect(resolveVersions(["manifest"], projectDirV2)).resolves.toEqual([
-      "1.11.3",
+      "1.11.4",
     ])
     await expect(resolveVersions(["manifest"], projectDirV1)).rejects.toThrow(
       "No Julia version exists matching specifier"
