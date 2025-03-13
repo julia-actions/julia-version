@@ -107,8 +107,8 @@ describe("resolveVersions tests", () => {
 
 describe("resolveVersion tests", () => {
   // Will need to update these values if `__fixtures__/versions.json` is updated.
-  const latestRelease = "1.11.3"
-  const latestLts = "1.10.8"
+  const latestRelease = "1.11.4"
+  const latestLts = "1.10.9"
 
   describe("specific versions", () => {
     it("Must return an available version", () => {
