@@ -10,6 +10,7 @@ import { tmpdir } from "node:os"
 import {
   getJuliaCompatRange,
   getJuliaProjectFile,
+  getJuliaManifestFile,
   validJuliaCompatRange,
 } from "../src/project.js"
 
@@ -26,10 +27,10 @@ describe("getJuliaProjectFile tests", () => {
 
   it("Can determine project file is missing", () => {
     expect(() => getJuliaProjectFile("DNE.toml")).toThrow(
-      "Unable to locate project file"
+      "Unable to locate Julia project file"
     )
     expect(() => getJuliaProjectFile(".")).toThrow(
-      "Unable to locate project file"
+      "Unable to locate Julia project file"
     )
   })
 
@@ -66,6 +67,60 @@ describe("getJuliaProjectFile tests", () => {
 
       process.chdir(projectDir)
       expect(getJuliaProjectFile(".")).toEqual("Project.toml")
+    })
+  })
+})
+
+describe("getJuliaManifestFile tests", () => {
+  let orgWorkingDir: string
+
+  beforeEach(() => {
+    orgWorkingDir = process.cwd()
+  })
+
+  afterEach(() => {
+    process.chdir(orgWorkingDir)
+  })
+
+  it("Can determine manifest file is missing", () => {
+    expect(() => getJuliaManifestFile(".")).toThrow(
+      "Unable to locate Julia manifest file"
+    )
+  })
+
+  it("Can determine project file from a directory", () => {
+    fs.mkdtemp(path.join(tmpdir(), "julia-version-"), (err, projectDir) => {
+      const manifestFile = path.join(projectDir, "Manifest.toml")
+      fs.closeSync(fs.openSync(manifestFile, "w"))
+      expect(getJuliaManifestFile(projectDir)).toEqual(manifestFile)
+    })
+
+    fs.mkdtemp(path.join(tmpdir(), "julia-version-"), (err, projectDir) => {
+      const manifestFile = path.join(projectDir, "JuliaManifest.toml")
+      fs.closeSync(fs.openSync(manifestFile, "w"))
+      expect(getJuliaManifestFile(projectDir)).toEqual(manifestFile)
+    })
+  })
+
+  it("Prefers using JuliaManifest.toml over Manifest.toml", () => {
+    fs.mkdtemp(path.join(tmpdir(), "julia-version-"), (err, projectDir) => {
+      const manifestFile = path.join(projectDir, "Manifest.toml")
+      fs.closeSync(fs.openSync(manifestFile, "w"))
+
+      const juliaManifestFile = path.join(projectDir, "JuliaManifest.toml")
+      fs.closeSync(fs.openSync(juliaManifestFile, "w"))
+
+      expect(getJuliaManifestFile(projectDir)).toEqual(juliaManifestFile)
+    })
+  })
+
+  it("Can determine project from the current working directory", () => {
+    fs.mkdtemp(path.join(tmpdir(), "julia-version-"), (err, projectDir) => {
+      const projectFile = path.join(projectDir, "Manifest.toml")
+      fs.closeSync(fs.openSync(projectFile, "w"))
+
+      process.chdir(projectDir)
+      expect(getJuliaManifestFile(".")).toEqual("Manifest.toml")
     })
   })
 })

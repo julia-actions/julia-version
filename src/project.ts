@@ -9,8 +9,9 @@ export type JuliaProjectTOML = {
 }
 
 /**
- * Determine the path to a Julia project file from a directory or filename.
+ * Determine the path to a Julia project file from the project.
  *
+ * @param juliaProject: The Julia project/environment.
  * @returns The path to the Julia project file.
  * @throws Error if the Julia project file doesn't exist.
  */
@@ -31,11 +32,45 @@ export function getJuliaProjectFile(juliaProject: string): string {
 
   if (!juliaProjectFile) {
     throw new Error(
-      `Unable to locate project file with project input: ${juliaProject}`
+      `Unable to locate Julia project file with project: ${juliaProject}`
     )
   }
 
   return juliaProjectFile
+}
+
+/**
+ * Determine the path to a Julia manifest file from the project.
+ *
+ * @param juliaProject: The Julia project/environment.
+ * @returns The path to the Julia manifest file.
+ * @throws Error if the Julia manifest file doesn't exist.
+ */
+export function getJuliaManifestFile(juliaProject: string): string {
+  let juliaManifestFile: string = ""
+
+  let juliaProjectDir: string
+  if (fs.existsSync(juliaProject) && fs.lstatSync(juliaProject).isFile()) {
+    juliaProjectDir = path.basename(juliaProject)
+  } else {
+    juliaProjectDir = juliaProject
+  }
+
+  for (const filename of ["JuliaManifest.toml", "Manifest.toml"]) {
+    const p = path.join(juliaProjectDir, filename)
+    if (fs.existsSync(p) && fs.lstatSync(p).isFile()) {
+      juliaManifestFile = p
+      break
+    }
+  }
+
+  if (!juliaManifestFile) {
+    throw new Error(
+      `Unable to locate Julia manifest file with project: ${juliaProject}`
+    )
+  }
+
+  return juliaManifestFile
 }
 
 /**

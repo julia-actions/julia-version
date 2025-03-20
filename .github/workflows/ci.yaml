@@ -43,10 +43,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create Project.toml
+      - name: Create Project.toml and Manifest.toml
         shell: bash
         run: |
-          echo -e '[compat]\njulia = "1.6"' >Project.toml
+          echo -e '[compat]\njulia = "1.7"' >Project.toml
+          echo -e 'julia_version = "1.7.3"' >Manifest.toml
 
       - name: Test julia-version
         id: julia-version
@@ -54,6 +55,7 @@ jobs:
         with:
           versions: |
             - min
+            - manifest
             - lts
             - 1
             - ~1.10
@@ -63,10 +65,11 @@ jobs:
         shell: bash
         run: |
           set -x
-          [[ "$(jq -r 'length' <<<"$unique_json")" -eq 3 ]] || exit 1
-          [[ "$(jq -r '.[0]' <<<"$unique_json")" == "1.6.0" ]] || exit 1
-          [[ "$(jq -r '.[1]' <<<"$unique_json")" =~ ^1\.10\.([8-9]|[1-9][0-9]*)$ ]] || exit 1   # [1.10.8, 1.11.0)
-          [[ "$(jq -r '.[2]' <<<"$unique_json")" =~ ^1\.(1[1-9]|2[0-9]+)\.[0-9]+$ ]] || exit 1  # [1.11.0, ∞)
+          [[ "$(jq -r 'length' <<<"$unique_json")" -eq 4 ]] || exit 1
+          [[ "$(jq -r '.[0]' <<<"$unique_json")" == "1.7.0" ]] || exit 1
+          [[ "$(jq -r '.[1]' <<<"$unique_json")" == "1.7.3" ]] || exit 1
+          [[ "$(jq -r '.[2]' <<<"$unique_json")" =~ ^1\.10\.(9|[1-9][0-9]*)$ ]] || exit 1   # [1.10.9, 1.11.0)
+          [[ "$(jq -r '.[3]' <<<"$unique_json")" =~ ^1\.(1[1-9]|2[0-9]+)\.[0-9]+$ ]] || exit 1  # [1.11.0, ∞)
 
           [[ "$version" == "" ]] || exit 1
         env:
