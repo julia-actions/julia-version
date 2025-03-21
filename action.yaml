@@ -27,12 +27,15 @@ inputs:
     required: false
     default: warn
 outputs:
-  unique-json:
-    description: The unique JSON list of resolved Julia versions.
-  version:
+  resolved-json:
     description: >-
-      The single resolved Julia version when the input is a single version
-      specifier. Will be an empty string if version cannot be resolved.
+      The unique JSON list of resolved Julia versions. Any versions which could
+      not be resolved will be excluded from this list.
+  resolved:
+    description: >-
+      A single resolved Julia version when the input `versions` contains is a
+      single version specifier. Will be an empty string if version cannot be
+      resolved.
 runs:
   using: node20
   main: dist/index.js
