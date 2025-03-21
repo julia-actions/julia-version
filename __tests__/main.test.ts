@@ -58,14 +58,14 @@ describe("run", () => {
     // Verify the time output was set.
     expect(core.setOutput).toHaveBeenNthCalledWith(
       1,
-      "unique-json",
+      "resolved-json",
       // Regex to confirm that version output is a JSON list of version strings
       expect.stringMatching(/^\["1\.\d+\.\d+"\]$/)
     )
 
     expect(core.setOutput).toHaveBeenNthCalledWith(
       2,
-      "version",
+      "resolved",
       expect.stringMatching(/^1\.\d+\.\d+$/)
     )
   })

@@ -75,8 +75,8 @@ jobs:
 
 | Name               | Description | Example |
 |:-------------------|:------------|:--------|
-| `unique-json`      | The unique JSON list of resolved Julia versions. | <pre><code class="language-json">["1.0.0", "1.10.8", "1.11.3"]</code></pre> |
-| `version`          | The single resolved Julia version when the input is a single version specifier. Will be an empty string if version cannot be resolved. | `1.11.3` |
+| `resolved-json`    | The unique JSON list of resolved Julia versions. Any versions which could not be resolved will be excluded from this list. | <pre><code class="language-json">["1.0.0", "1.10.8", "1.11.3"]</code></pre> |
+| `resolved`         | A single resolved Julia version when the input `versions` contains is a single version specifier. Will be an empty string if version cannot be resolved. | `1.11.3` |
 
 <!-- markdownlint-enable MD033 -->
 <!-- prettier-ignore-end -->
@@ -155,7 +155,10 @@ revisions are available (e.g. if `^1 == 1.11` then `1.10`, `1.11`, and `1.12`).
 The action will validate that a nightly with this specified version is available
 and if not the version will resolve to `null`.
 
-Note: May cause slowdown due to using HTTP HEAD request.
+Note verifying the existence of a nightly revision which uses a major/minor
+version requires the use of an HTTP HEAD request which takes a couple of
+seconds. The `nightly` alias skips this check as that revision should always
+exist.
 
 ### `lts` Alias
 
