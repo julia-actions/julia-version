@@ -49310,9 +49310,9 @@ async function run() {
         coreExports.debug(`ifMissing=${ifMissing}`);
         const resolvedVersions = await resolveVersions(versionSpecifiers, juliaProject, { ifMissing });
         const uniqueVersions = versionSort(uniqueArray(resolvedVersions.filter((value) => value !== null)));
-        setOutput("unique-json", JSON.stringify(uniqueVersions));
+        setOutput("resolved-json", JSON.stringify(uniqueVersions));
         if (versionSpecifiers.length == 1) {
-            setOutput("version", uniqueVersions[0] || "");
+            setOutput("resolved", uniqueVersions[0] || "");
         }
     }
     catch (error) {

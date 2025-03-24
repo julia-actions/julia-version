@@ -39,10 +39,10 @@ export async function run(): Promise<void> {
       uniqueArray(resolvedVersions.filter<string>((value) => value !== null))
     )
 
-    setOutput("unique-json", JSON.stringify(uniqueVersions))
+    setOutput("resolved-json", JSON.stringify(uniqueVersions))
 
     if (versionSpecifiers.length == 1) {
-      setOutput("version", uniqueVersions[0] || "")
+      setOutput("resolved", uniqueVersions[0] || "")
     }
   } catch (error) {
     // Fail the workflow run if an error occurs

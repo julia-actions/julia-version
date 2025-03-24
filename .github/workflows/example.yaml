@@ -16,7 +16,7 @@ jobs:
     name: Resolve Julia Versions
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.julia-version.outputs.unique-json }}
+      json: ${{ steps.julia-version.outputs.resolved-json }}
     steps:
       - uses: actions/checkout@v4
       - name: Create Project.toml
