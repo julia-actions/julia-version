@@ -25,7 +25,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.julia-version.outputs.unique-json }}
+      json: ${{ steps.julia-version.outputs.resolved-json }}
     steps:
       - uses: actions/checkout@v4 # Needed for "min" to access the Project.toml
       - uses: julia-actions/julia-version@v1
