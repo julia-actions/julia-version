@@ -1,9 +1,9 @@
 # Julia Version
 
-[![GitHub Super-Linter](https://github.com/julia-action/julia-version/actions/workflows/linter.yaml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/julia-action/julia-version/actions/workflows/ci.yaml/badge.svg)
-[![Check Transpiled](https://github.com/julia-action/julia-version/actions/workflows/check-dist.yaml/badge.svg)](https://github.com/julia-action/julia-version/actions/workflows/check-dist.yaml)
-[![CodeQL](https://github.com/julia-action/julia-version/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/julia-action/julia-version/actions/workflows/codeql-analysis.yaml)
+[![GitHub Super-Linter](https://github.com/julia-actions/julia-version/actions/workflows/linter.yaml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/julia-actions/julia-version/actions/workflows/ci.yaml/badge.svg)
+[![Check Transpiled](https://github.com/julia-actions/julia-version/actions/workflows/check-dist.yaml/badge.svg)](https://github.com/julia-actions/julia-version/actions/workflows/check-dist.yaml)
+[![CodeQL](https://github.com/julia-actions/julia-version/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/julia-actions/julia-version/actions/workflows/codeql-analysis.yaml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
 Resolves a list of version specifiers into concrete Julia versions. The output
