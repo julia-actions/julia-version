@@ -99,7 +99,7 @@ else
 fi
 
 # 8. Point separate major release tag (e.g. v1, v2) to the new release
-if [ $new_major_release_tag != 'v0' ]; then
+if [ "$new_major_release_tag" != "v0" ]; then
 	if [ $is_major_release = 'yes' ]; then
 		# Create a new major version tag and point it to this release
 		git tag "$new_major_release_tag" --annotate --message "$new_major_release_tag Release"
