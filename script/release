@@ -99,14 +99,16 @@ else
 fi
 
 # 8. Point separate major release tag (e.g. v1, v2) to the new release
-if [ $is_major_release = 'yes' ]; then
-	# Create a new major version tag and point it to this release
-	git tag "$new_major_release_tag" --annotate --message "$new_major_release_tag Release"
-	echo -e "New major version tag: ${BOLD_GREEN}$new_major_release_tag${OFF}"
-else
-	# Update the major version tag to point it to this release
-	git tag "$latest_major_release_tag" --force --annotate --message "Sync $latest_major_release_tag tag with $new_tag"
-	echo -e "Synced ${BOLD_GREEN}$latest_major_release_tag${OFF} with ${BOLD_GREEN}$new_tag${OFF}"
+if [ "$new_major_release_tag" != "v0" ]; then
+	if [ $is_major_release = 'yes' ]; then
+		# Create a new major version tag and point it to this release
+		git tag "$new_major_release_tag" --annotate --message "$new_major_release_tag Release"
+		echo -e "New major version tag: ${BOLD_GREEN}$new_major_release_tag${OFF}"
+	else
+		# Update the major version tag to point it to this release
+		git tag "$latest_major_release_tag" --force --annotate --message "Sync $latest_major_release_tag tag with $new_tag"
+		echo -e "Synced ${BOLD_GREEN}$latest_major_release_tag${OFF} with ${BOLD_GREEN}$new_tag${OFF}"
+	fi
 fi
 
 # 9. Push the new tags (with commits, if any) to remote
