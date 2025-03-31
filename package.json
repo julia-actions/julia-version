@@ -42,7 +42,7 @@
     "node-fetch": "^3.3.2",
     "semver": "^7.7.0",
     "toml": "^3.0.0",
-    "yaml": "^2.7.0"
+    "yaml": "^2.7.1"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.6",
